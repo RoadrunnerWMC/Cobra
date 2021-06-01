@@ -1,0 +1,365 @@
+{
+    "root": {
+        "scripts": {
+            "add": {
+                "0":  {
+                    "name": "default_clr",
+                    "description": "Script that plays when a normal course is successfully completed."
+                },
+                "1":  {
+                    "name": "default_fail",
+                    "description": "Script that plays when a normal course is failed."
+                },
+                "2":  {
+                    "name": "enemy_clr"
+                },
+                "3":  {
+                    "name": "enemy_fail"
+                },
+                "4":  {
+                    "name": "toride_in",
+                    "description": "Script that plays when a tower is entered."
+                },
+                "5":  {
+                    "name": "toride_clr",
+                    "description": "Script that plays when a tower is successfully completed."
+                },
+                "6":  {
+                    "name": "toride_fail"
+                },
+                "7":  {
+                    "name": "toride_fail2"
+                },
+                "8":  {
+                    "name": "castle_in",
+                    "description": "Script that plays when a castle is entered."
+                },
+                "9":  {
+                    "name": "castle_clr",
+                    "description": "Script that plays when a castle is successfully completed."
+                },
+                "10": {
+                    "name": "castle_fail"
+                },
+                "11": {
+                    "name": "castle_fail2"
+                },
+                "12": {
+                    "name": "ghost_in",
+                    "description": "Script that plays when a ghost house is entered."
+                },
+                "13": {
+                    "name": "ghost_clr",
+                    "description": "Script that plays when a ghost house is successfully completed."
+                },
+                "14": {
+                    "name": "ghost_fail"
+                },
+                "15": {
+                    "name": "ghost_fail2"
+                },
+                "16": {
+                    "name": "cannon"
+                },
+                "17": {
+                    "name": "show_wm_note",
+                    "description": "Unofficial name, real name is unknown. Demangled symbol hash is 0x56f66ffc.\n\nCauses a WM_NOTE actor (if previously spawned) to appear above Mario's head, and then move to a random map node, with the camera following it."
+                },
+                "18": {
+                    "name": "dokan"
+                },
+                "19": {
+                    "name": "dokan_warp"
+                },
+                "20": {
+                    "name": "dokan_start"
+                },
+                "21": {
+                    "name": "W_Walking_in"
+                },
+                "22": {
+                    "name": "W_Walking_in_Normal"
+                },
+                "23": {
+                    "name": "W_Flying_in"
+                },
+                "24": {
+                    "name": "W_Cannon_in"
+                },
+                "25": {
+                    "name": "W_Cannon_in_Normal"
+                },
+                "26": {
+                    "description": "Unknown name. Demangled symbol hash is 0x649307aa."
+                },
+                "27": {
+                    "description": "Unknown name. Demangled symbol hash is 0x2a5ec5a7."
+                },
+                "28": {
+                    "name": "wSign_koopaCastle_in"
+                },
+                "29": {
+                    "description": "Unknown name. Demangled symbol hash is 0xcae3b49f. Might be \"fade_test\"?"
+                },
+                "30": {
+                    "name": "view_world"
+                },
+                "31": {
+                    "name": "course_in"
+                },
+                "32": {
+                    "name": "kinoko_out"
+                },
+                "33": {
+                    "name": "airship_course_in"
+                },
+                "34": {
+                    "name": "airship_course_out"
+                },
+                "35": {
+                    "name": "start_kinoko_in"
+                },
+                "36": {
+                    "description": "Unknown name. Demangled symbol hash is 0x281e8a18."
+                },
+                "37": {
+                    "description": "Unknown name. Demangled symbol hash is 0xcf0daa08."
+                },
+                "38": {
+                    "name": "null"
+                },
+                "39": {
+                    "name": "antlion"
+                },
+                "40": {
+                    "name": "killer"
+                },
+                "41": {
+                    "name": "start_battle"
+                },
+                "42": {
+                    "name": "Switch"
+                },
+                "43": {
+                    "name": "KoopaCastleAppear"
+                },
+                "44": {
+                    "name": "KinopioStart"
+                },
+                "45": {
+                    "description": "Unknown name. Demangled symbol hash is 0xcfc42869."
+                },
+                "46": {
+                    "description": "Unknown name. Demangled symbol hash is 0xaefdd774."
+                },
+                "47": {
+                    "name": "Pause_Menu"
+                },
+                "48": {
+                    "name": "airship_clear"
+                },
+                "49": {
+                    "name": "Stock_Menu"
+                },
+                "50": {
+                    "name": "WorldSelect_Menu"
+                },
+                "51": {
+                    "name": "antlion_star"
+                },
+                "52": {
+                    "name": "GameStart"
+                }
+            }
+        },
+        "commands": {
+            "add": {
+                "0": {
+                    "name": "wait",
+                    "description": "Causes the script to delay before continuing. Note: NSMBW runs at 60 FPS.",
+                    "arg": {"name": "Duration", "unit": "frames"}
+                },
+                "1": {},
+                "2": {},
+                "3": {},
+                "4": {},
+                "5": {
+                    "name": "end",
+                    "description": "Ends the script.",
+                    "arg": null
+                },
+                "6": {},
+                "7": {},
+                "8": {},
+                "9": {},
+                "10": {},
+                "11": {},
+                "12": {},
+                "13": {},
+                "14": {},
+                "15": {},
+                "16": {},
+                "17": {},
+                "18": {},
+                "19": {},
+                "20": {},
+                "21": {},
+                "22": {},
+                "23": {},
+                "24": {},
+                "25": {},
+                "26": {},
+                "27": {},
+                "28": {},
+                "29": {},
+                "30": {},
+                "31": {
+                    "name": "show_wm_note_over_player",
+                    "description": "Causes a WM_NOTE actor (if previously spawned) to appear above Mario's head.",
+                    "arg": null
+                },
+                "32": {
+                    "name": "move_wm_note",
+                    "description": "Causes a WM_NOTE actor (if previously spawned) to move to a random map node, with the camera following it.",
+                    "arg": null
+                },
+                "33": {},
+                "34": {},
+                "35": {"unused": true},
+                "36": {},
+                "37": {},
+                "38": {},
+                "39": {"unused": true},
+                "40": {},
+                "41": {},
+                "42": {},
+                "43": {},
+                "44": {},
+                "45": {},
+                "46": {},
+                "47": {},
+                "48": {},
+                "49": {},
+                "50": {},
+                "51": {},
+                "52": {},
+                "53": {},
+                "54": {},
+                "55": {},
+                "56": {},
+                "57": {},
+                "58": {},
+                "59": {},
+                "60": {},
+                "61": {},
+                "62": {},
+                "63": {},
+                "64": {},
+                "65": {},
+                "66": {},
+                "67": {},
+                "68": {},
+                "69": {},
+                "70": {},
+                "71": {},
+                "72": {},
+                "73": {},
+                "74": {},
+                "75": {},
+                "76": {},
+                "77": {},
+                "78": {},
+                "79": {},
+                "80": {},
+                "81": {},
+                "82": {},
+                "83": {},
+                "84": {},
+                "85": {"unused": true},
+                "86": {},
+                "87": {},
+                "88": {"unused": true},
+                "89": {},
+                "90": {},
+                "91": {},
+                "92": {},
+                "93": {"unused": true},
+                "94": {},
+                "95": {},
+                "96": {},
+                "97": {},
+                "98": {},
+                "99": {},
+                "100": {},
+                "101": {},
+                "102": {},
+                "103": {},
+                "104": {},
+                "105": {},
+                "106": {},
+                "107": {},
+                "108": {},
+                "109": {},
+                "110": {},
+                "111": {},
+                "112": {},
+                "113": {},
+                "114": {},
+                "115": {},
+                "116": {},
+                "117": {"unused": true},
+                "118": {},
+                "119": {},
+                "120": {},
+                "121": {},
+                "122": {},
+                "123": {},
+                "124": {},
+                "125": {"unused": true},
+                "126": {},
+                "127": {},
+                "128": {},
+                "129": {},
+                "130": {},
+                "131": {},
+                "132": {},
+                "133": {},
+                "134": {},
+                "135": {},
+                "136": {},
+                "137": {},
+                "138": {"unused": true},
+                "139": {},
+                "140": {},
+                "141": {},
+                "142": {},
+                "143": {},
+                "144": {},
+                "145": {},
+                "146": {},
+                "147": {},
+                "148": {},
+                "149": {},
+                "150": {},
+                "151": {},
+                "152": {},
+                "153": {},
+                "154": {},
+                "155": {},
+                "156": {},
+                "157": {},
+                "158": {},
+                "159": {},
+                "160": {},
+                "161": {},
+                "162": {},
+                "163": {},
+                "164": {},
+                "165": {},
+                "166": {},
+                "167": {},
+                "168": {}
+            }
+        }
+    }
+}
