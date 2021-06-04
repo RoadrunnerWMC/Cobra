@@ -13,32 +13,6 @@ import export_nsmbu
 import common
 
 
-# def read_from_dol(dol: code_file_dol.DOL, addr: int, length: int) -> bytes:
-#     """
-#     Read some number of bytes from some address in a DOL
-#     """
-#     for section in dol.sections:
-#         if section.address <= addr and addr + length < section.address + section.size:
-#             addr_in_section = addr - section.address
-#             return section.data[addr_in_section : addr_in_section + length]
-
-
-# def read_u32_from_dol(dol: code_file_dol.DOL, addr: int) -> int:
-#     """
-#     Read a big-endian uint32_t from some address in a DOL
-#     """
-#     return struct.unpack_from('>I', read_from_dol(dol, addr, 4), 0)[0]
-
-
-# def autodetect_table_addr(dol: code_file_dol.DOL) -> int:
-#     """
-#     Try to auto-detect the address of the scripts table.
-#     Return None if it can't be found.
-#     """
-#     print('WARNING/TODO: I haven\'t implemented address autodetection yet')
-#     return SCRIPTS_TABLE_ADDRESS_PALV1
-
-
 class SourceType(enum.Enum):
     """
     Different things we're able to read scripts from
@@ -52,6 +26,7 @@ class SourceType(enum.Enum):
     CEMU_RAM_DUMP_FILE = 'Cemu RAM dump file'
     DOL_FILE = 'DOL file'
     ALF_FILE = 'ALF file'
+    RPX_FILE = 'RPX file'
 
     def game(self) -> common.Game:
         """
@@ -59,7 +34,7 @@ class SourceType(enum.Enum):
         """
         if self in {self.CITRA_RAM_DUMP_FOLDER, self.CITRA_RAM_DUMP_FILE}:
             return common.Game.NSMB2
-        elif self in {self.CEMU_RAM_DUMP_FOLDER, self.CEMU_RAM_DUMP_FILE}:
+        elif self in {self.CEMU_RAM_DUMP_FOLDER, self.CEMU_RAM_DUMP_FILE, self.RPX_FILE}:
             return common.Game.NSMBU
         else:
             return common.Game.NSMBW
@@ -113,9 +88,12 @@ def detect_source_type(path: pathlib.Path) -> SourceType:
         elif size == 0x4e000000:  # ~ 1.2 GB
             return SourceType.CEMU_RAM_DUMP_FILE
 
-        # Look for a DOL-like header
+        # Check header
         with path.open('rb') as f:
             first_0x100 = f.read(0x100)
+
+        if first_0x100[:4] == b'\x7fELF':
+            return SourceType.RPX_FILE
 
         if detect_dol_from_header(first_0x100):
             return SourceType.DOL_FILE
@@ -128,8 +106,12 @@ def make_source_and_analysis(source_type: SourceType, file) -> (export_base.Sour
     Create instances of the appropriate Source and Analysis subclasses
     for a file representing the specified source_type
     """
-    if source_type is SourceType.CEMU_RAM_DUMP_FILE:
-        source = export_base.SimpleRamDumpSource(file, 0x02000000, '>')
+    if source_type is SourceType.RPX_FILE:
+        source = export_nsmbu.RPXFileSource(file)
+        return source, export_nsmbu.NSMBUAnalysis(source)
+
+    elif source_type is SourceType.CEMU_RAM_DUMP_FILE:
+        source = export_nsmbu.CemuRAMDumpSource(file)
         return source, export_nsmbu.NSMBUAnalysis(source)
 
     raise NotImplementedError
@@ -154,7 +136,8 @@ def read_scripts(source: export_base.Source, analysis: export_base.Analysis) -> 
         # Read script itself
         source.seek(script_addr)
         for i in range(999):
-            command_id, arg = struct.unpack_from(f'{analysis.endianness}II', source.read(8))
+            command_id = analysis.read_commands_u32(script_addr + i * 8 + 0)
+            arg = analysis.read_commands_u32(script_addr + i * 8 + 4)
 
             script.append(common.LowLevelCommand(command_id, arg))
 
@@ -186,7 +169,19 @@ def do_export(game: common.Game, input_file: pathlib.Path, scripts_file: pathlib
         analysis.analyze()
 
         scripts = read_scripts(source, analysis)
-        print(scripts)
 
-        variant = exporter.detect_game_variant(scripts)
+        for i, s in enumerate(scripts):
+            print(f'ScriptCommand script_{i:03d}[] = {{')
+            for cmd in s:
+                print(f'    {{{cmd.id}, {cmd.argument}}},')
+            print('};')
+            print('')
+
+        print('')
+        print('ScriptsTableEntry custom_world_map_scripts_table[] = {')
+        for i, s in enumerate(scripts):
+            print(f'    {{{s.category_id}, script_{i:03d}}},')
+        print('};')
+
+        variant = analysis.detect_game_variant()
         print(variant.name)

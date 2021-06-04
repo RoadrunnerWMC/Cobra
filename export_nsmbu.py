@@ -1,4 +1,5 @@
 import struct
+import zlib
 
 import common
 import export_base
@@ -12,12 +13,312 @@ def iter_bytes_matches(haystack: bytes, needle: bytes):
         idx = haystack.find(needle, idx + 1)
 
 
+class TheWorldsWorstPowerPCInterpreter:
+    """
+    An extremely minimal PPC interpreter that only implements the bare
+    minimum instructions required to reconstruct the command lists
+    """
+    def __init__(self, source):
+        self.source = source
+        self.registers = [0] * 32
+        self.memory = {}
+
+    def run_function_at(self, addr: int):
+        """
+        Run the function at addr up to the blr
+        """
+        for i in range(9999):
+            self.source.seek(addr)
+            inst, = struct.unpack('>I', self.source.read(4))
+
+            if inst == 0x4E800020:  # blr
+                return
+
+            self.run_inst(inst)
+
+            addr += 4
+
+        else:
+            print("WARNING: function didn't end")
+
+    def run_inst(self, inst: int):
+        """
+        Run one instruction with the value given
+        """
+        # Decode
+        opcode = inst >> 26
+        s = (inst >> 21) & 0x1f
+        a = (inst >> 16) & 0x1f
+        d = inst & 0xffff
+        if d & 0x8000:
+            d = d - 0x10000
+
+        if opcode == 14:  # addi
+            b = 0 if a == 0 else self.registers[a]
+            self.registers[s] = b + d
+
+        elif opcode == 15:  # addis
+            b = 0 if a == 0 else self.registers[a]
+            self.registers[s] = b + (d << 16)
+
+        elif opcode == 31:  # (various, depends on opcode2)
+            opcode2 = (inst >> 1) & 0x3ff
+
+            if opcode2 == 444:  # or (used because mr is a pseudoinst of it)
+                b = (inst >> 11) & 0x1f
+                self.registers[a] = self.registers[s] | self.registers[b]
+
+            else:
+                print(f'WARNING: unexpected opcode 31.{opcode2}')
+
+        elif opcode == 32:  # lwz
+            b = 0 if a == 0 else self.registers[a]
+            self.registers[s] = self.memory.get(b + d)
+
+        elif opcode == 36:  # stw
+            self.memory[self.registers[a] + d] = self.registers[s]
+
+        elif opcode == 37:  # stwu
+            ea = self.registers[a] + d
+            self.memory[ea] = self.registers[s]
+            self.registers[a] = ea
+
+        elif opcode == 46:  # lmw
+            pass  # Not required
+
+        elif opcode == 47:  # stmw
+            pass  # Not required
+
+        elif opcode == 48:  # lfs
+            pass  # Not required
+
+        elif opcode == 52:  # stfs
+            pass  # Not required
+
+        else:
+            print(f'WARNING: unexpected opcode {opcode}')
+
+
+class RPXSection:
+    """
+    Abstract base class for a RPX section
+    """
+    def __init__(self, file, flags, addr, offset, size):
+        self.file = file
+        self.addr = addr
+
+
+    def has(self, addr: int) -> bool:
+        """
+        Check if this section contains the specified address
+        """
+        raise NotImplementedError
+
+
+    def seek(self, addr: int):
+        """
+        Seek to a specific RAM address
+        """
+        raise NotImplementedError
+
+
+    def read(self, amount: int) -> bytes:
+        """
+        Like file.read()
+        """
+        raise NotImplementedError
+
+
+class RPXSectionUncompressed(RPXSection):
+    """
+    Uncompressed RPX section. This is just a thin wrapper around the
+    file-like object, since we can read from it directly
+    """
+    def __init__(self, file, flags, addr, offset, size):
+        super().__init__(file, flags, addr, offset, size)
+        self.addr = addr
+        self.offset = offset
+        self.size = size
+
+
+    def has(self, addr: int) -> bool:
+        """
+        Check if this section contains the specified address
+        """
+        return self.addr <= addr < self.addr + self.size
+
+
+    def seek(self, addr: int):
+        """
+        Seek to a specific RAM address
+        """
+        self.file.seek(addr - self.addr)
+
+
+    def read(self, amount: int) -> bytes:
+        """
+        Like file.read()
+        """
+        return self.file.read(amount)
+
+
+class RPXSectionCompressed(RPXSection):
+    """
+    Compressed RPX section. This class is lazy, decompressing the
+    section data only if .read() is called.
+    """
+    def __init__(self, file, flags, addr, offset, size):
+        super().__init__(file, flags, addr, offset, size)
+        self.addr = addr
+
+        self.decompressed_yet = False
+        self.offset = offset
+        self.size = size
+
+        self.file.seek(offset)
+        self.decomp_size, = struct.unpack('>I', file.read(4))
+
+        self.cursor = 0
+
+
+    def has(self, addr: int) -> bool:
+        """
+        Check if this section contains the specified address
+        """
+        return self.addr <= addr < self.addr + self.decomp_size
+
+
+    def ensure_decompressed(self):
+        """
+        If the data hasn't been decompressed yet, decompress it.
+        Otherwise do nothing.
+        """
+        if self.decompressed_yet: return
+
+        self.file.seek(self.offset + 4)
+        self.decomp_data = zlib.decompress(self.file.read(self.size - 4))
+
+        self.decompressed_yet = True
+
+
+    def seek(self, addr: int):
+        """
+        Seek to a specific RAM address
+        """
+        self.cursor = addr - self.addr
+
+
+    def read(self, amount: int) -> bytes:
+        """
+        Like file.read()
+        """
+        self.ensure_decompressed()
+        data = self.decomp_data[self.cursor : self.cursor + amount]
+        self.cursor += amount
+        return data
+
+
+class RPXFileSource(export_base.Source):
+    """
+    Source subclass for an RPX file
+    """
+    def __init__(self, file):
+        super().__init__(file)
+
+        # Check magic
+        file.seek(0)
+        magic = file.read(4)
+        if magic != b'\x7fELF':
+            raise ValueError(f'Incorrect RPX magic ({magic})')
+
+        # Read sections table info (offset, entry size, num entries)
+        file.seek(0x20)
+        shoff, = struct.unpack('>I', file.read(4))
+        file.seek(0x2E)
+        shentsize, shnum = struct.unpack('>HH', file.read(4))
+
+        # Read sections table
+        self.sections = []
+        for i in range(shnum):
+            shent_base = shoff + shentsize * i
+            file.seek(shent_base + 8)
+            flags, addr, offset, size = struct.unpack('>4I', file.read(16))
+
+            if flags & 0x08000000:
+                self.sections.append(RPXSectionCompressed(file, flags, addr, offset, size))
+            else:
+                self.sections.append(RPXSectionUncompressed(file, flags, addr, offset, size))
+
+        # So .read() can know which section was most recently .seek()ed in
+        self.current_section = None
+
+
+    def get_section(self, addr: int) -> RPXSection:
+        """
+        Get the section containing the specified address (or None if none)
+        """
+        for section in self.sections:
+            if section.has(addr):
+                return section
+
+
+    def seek(self, addr: int):
+        """
+        Seek to a specific RAM address
+        """
+        self.current_section = self.get_section(addr)
+        self.current_section.seek(addr)
+
+
+    def read(self, amount: int) -> bytes:
+        """
+        Like file.read()
+        """
+        return self.current_section.read(amount)
+
+
+class CemuRAMDumpSource(export_base.SimpleRAMDumpSource):
+    """
+    SimpleRAMDumpSource subclass for a Cemu ram dump
+    """
+    def __init__(self, file):
+        super().__init__(file, 0x02000000, '>')
+
+
 class NSMBUAnalysis(export_base.Analysis):
     """
     Analysis subclass for NSMBU
     """
     uses_categories = True
     endianness = '>'
+
+    def __init__(self, source):
+        super().__init__(source)
+
+        # TODO: integrate this stuff better into the base class .analyze()
+
+        if isinstance(source, RPXFileSource):
+            static_init_addr = self.find_static_init_func()
+
+            interpreter = TheWorldsWorstPowerPCInterpreter(source)
+            interpreter.run_function_at(static_init_addr)
+            self.memory_overrides = interpreter.memory
+
+        else:
+            self.memory_overrides = {}
+
+
+    def read_commands_u32(self, addr: int) -> int:
+        """
+        Read a u32 from an address, possibly from self.memory_overrides
+        if there's an entry for it there
+        """
+        if addr in self.memory_overrides:
+            return self.memory_overrides[addr]
+        else:
+            self.source.seek(addr)
+            return struct.unpack('>I', self.source.read(4))[0]
+
 
     def find_table_addr(self) -> int:
         """
@@ -72,8 +373,7 @@ class NSMBUAnalysis(export_base.Analysis):
 
         # Read the command ID preceding it -- i.e. the last command in the
         # *first* script
-        self.source.seek(second_script_addr - 8)
-        first_script_last_cmd, = struct.unpack_from('>I', self.source.read(4))
+        first_script_last_cmd = self.read_commands_u32(second_script_addr - 8)
 
         # That must be the terminator command
         return first_script_last_cmd

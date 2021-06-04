@@ -55,7 +55,7 @@ class Source:
         return self.file.read(amount)
 
 
-class SimpleRamDumpSource(Source):
+class SimpleRAMDumpSource(Source):
     """
     Basic source that just interprets the file as a RAM dump from some base address
     """
@@ -94,6 +94,16 @@ class Analysis:
     def __init__(self, source, table_addr:int=None):
         self.source = source
         self.table_addr = table_addr
+
+
+    def read_commands_u32(self, addr: int) -> int:
+        """
+        Use this instead of self.source.seek()/.read() when reading the
+        commands lists data. This lets subclasses fill in extra data
+        derived from the static init functions (NSMB2, NSMBU).
+        """
+        self.source.seek(addr)
+        return struct.unpack('>I', self.source.read(4))[0]
 
 
     def analyze(self):
