@@ -152,7 +152,7 @@ class RPXSectionUncompressed(RPXSection):
         """
         Seek to a specific RAM address
         """
-        self.file.seek(addr - self.addr)
+        self.file.seek(self.offset + addr - self.addr)
 
 
     def read(self, amount: int) -> bytes:
