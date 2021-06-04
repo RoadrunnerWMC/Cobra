@@ -5,6 +5,13 @@ import export_base
 import game_variants
 
 
+def iter_bytes_matches(haystack: bytes, needle: bytes):
+    idx = haystack.find(needle)
+    while idx != -1:
+        yield idx
+        idx = haystack.find(needle, idx + 1)
+
+
 class NSMBUAnalysis(export_base.Analysis):
     """
     Analysis subclass for NSMBU
@@ -14,7 +21,7 @@ class NSMBUAnalysis(export_base.Analysis):
 
     def find_table_addr(self) -> int:
         """
-        Auto-detect the address of the scripts table in memory.
+        Auto-detect the address of the scripts table in memory (e.g. 0x10044a98 for NSMBU 1.0.0 US).
         Return None if not found.
         """
         # Find "TalkWindow_Sign_00", which is an easily identified string
@@ -39,13 +46,11 @@ class NSMBUAnalysis(export_base.Analysis):
             if window[offs : offs+len(TABLE_START)] == TABLE_START:
                 return window_base + offs
 
-        # :(
-        return None
-
 
     def find_table_length(self) -> int:
         """
-        Auto-detect the number of entries in the scripts table (i.e. 119 for NSMBU 1.0.0)
+        Auto-detect the number of entries in the scripts table (e.g. 119 for NSMBU 1.0.0 US).
+        Return None if not found.
         """
         self.source.seek(self.table_addr)
         table = self.source.read(0x1000)
@@ -58,7 +63,8 @@ class NSMBUAnalysis(export_base.Analysis):
 
     def find_terminator_command_id(self) -> int:
         """
-        Auto-detect the terminator command ID (i.e. 341 for NSMBU 1.0.0)
+        Auto-detect the terminator command ID (e.g. 341 for NSMBU 1.0.0 US).
+        Return None if not found.
         """
         # Get the address of the second script in the table
         self.source.seek(self.table_addr + 12)
@@ -73,12 +79,91 @@ class NSMBUAnalysis(export_base.Analysis):
         return first_script_last_cmd
 
 
+    def find_static_init_func(self) -> int:
+        """
+        Auto-detect the static init function's address (e.g. 0x021DAB60 for NSMBU 1.0.0 US).
+        Return None if not found.
+        """
+        OPCODE_ADDI = 14
+        OPCODE_LI = (14, 0)   # addi with rA=0
+        OPCODE_LIS = (15, 0)  # addis with rA=0
+        OPCODE_STW = 36
+        OPCODE_STWU = 37
+        OPCODE_STMW = 47
+        OPCODE_LFS = 48
+        OPCODE_STFS = 52
+
+        BLR_BYTES = bytes.fromhex('4E 80 00 20')
+
+        STATIC_INIT_FUNC_START = [
+            OPCODE_STWU,  # 00
+            OPCODE_STMW,  # 04
+            OPCODE_LIS,   # 08
+            OPCODE_LIS,   # 0C
+            OPCODE_LI,    # 10
+            OPCODE_ADDI,  # 14
+            OPCODE_LI,    # 18
+            OPCODE_LIS,   # 1C
+            OPCODE_LFS,   # 20
+            OPCODE_LIS,   # 24
+            OPCODE_LI,    # 28
+            OPCODE_LIS,   # 2C
+            OPCODE_STFS,  # 30
+            OPCODE_ADDI,  # 34
+            OPCODE_STW,   # 38
+            OPCODE_ADDI,  # 3C
+        ]
+
+        def check_if_static_init_func(addr: int) -> bool:
+            """
+            Check if the function at addr matches the instruction
+            pattern of STATIC_INIT_FUNC_START
+            """
+            self.source.seek(addr)
+            instructions = struct.unpack_from('>16I', self.source.read(0x40))
+
+            for instruction, expected_opcode in zip(instructions, STATIC_INIT_FUNC_START):
+                expected_ra = None
+                if isinstance(expected_opcode, tuple):
+                    expected_opcode, expected_ra = expected_opcode
+
+                # Opcode: x >> 26
+                if instruction >> 26 != expected_opcode:
+                    return False
+
+                # rA: (x >> 16) & 0x1f
+                if expected_ra is not None and (instruction >> 16) & 0x1f != expected_ra:
+                    return False
+
+            return True
+
+        SEARCH_START = 0x021C0000
+        SEARCH_END = 0x02200000
+        BLOCK_SIZE = 0x8000
+
+        # We search for BLR_BYTES (marking the ends of functions) and
+        # check if what immediately follows them (the start of the next
+        # function) is the static init function
+        for block_start_addr in range(SEARCH_START, SEARCH_END, BLOCK_SIZE):
+            self.source.seek(block_start_addr)
+            block = self.source.read(BLOCK_SIZE)
+
+            for idx in iter_bytes_matches(block, BLR_BYTES):
+                if idx % 4 != 0: continue  # if it's not aligned, it's
+                                           # not actually an instruction
+
+                func_start = block_start_addr + idx + 4
+                if check_if_static_init_func(func_start):
+                    return func_start
+
+
     def find_static_init_hook_point(self) -> int:
         """
         Auto-detect the address in the static init function at which we can hook.
         Some self-fields are guaranteed to have been previously filled
         in; see analyze() for the exact order.
         """
+        static_init_addr = self.find_static_init_func()
         # TODO: write this function
         return 0
 
@@ -100,10 +185,10 @@ class NSMBUAnalysis(export_base.Analysis):
         variants = game_variants.load_game_json(common.Game.NSMBU)
 
         if self.terminator_command == 341:
-            return variants['root']
+            return variants['1.0.0']
         elif self.terminator_command == 342:
-            return variants['110']
+            return variants['1.1.0_1.2.0']
         elif self.terminator_command == 344:
-            return variants['130']
+            return variants['1.3.0']
 
         raise ValueError(f'Unrecognized version of NSMBU, using terminator command {self.terminator_command}')
