@@ -285,7 +285,7 @@ class NSMBUAnalysis(export_base.Analysis):
     """
     Analysis subclass for NSMBU
     """
-    uses_categories = True
+    uses_priorities = True
 
     def find_static_init_func(self) -> int:
         """
@@ -397,7 +397,7 @@ class NSMBUAnalysis(export_base.Analysis):
         window = self.source.read(0x1000)
 
         # Look for a specific byte pattern that indicates the start of the table
-        # (the first script's category, and the most-significant byte of its pointer)
+        # (the first script's priority, and the most-significant byte of its pointer)
         TABLE_START = bytes.fromhex('00 00 00 FF 10')
 
         for offs in range(0, len(window), 4):

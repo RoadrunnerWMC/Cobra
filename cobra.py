@@ -31,10 +31,10 @@ def main(argv:list=None) -> None:
         scripts_file = pArgs.scripts_file
         if scripts_file is None: scripts_file = input_file.with_suffix('.txt')
 
-        addrs_file = pArgs.addrs_file
-        if addrs_file is None: addrs_file = input_file.with_suffix('.json')
+        version_info_file = pArgs.version_info_file
+        if version_info_file is None: version_info_file = input_file.with_suffix('.json')
 
-        export.do_export(input_file, scripts_file, addrs_file)
+        export.do_export(input_file, scripts_file, version_info_file)
 
     parser_export = subparsers.add_parser('export', aliases=['e'],
         help='export all scripts from a code file or memory dump')
@@ -42,8 +42,8 @@ def main(argv:list=None) -> None:
         help='file to read scripts from')
     parser_export.add_argument('scripts_file', nargs='?', type=pathlib.Path,
         help='output file to save scripts to (.txt)')
-    parser_export.add_argument('addrs_file', nargs='?', type=pathlib.Path,
-        help='output file to save important autodetected addresses to (.json)')
+    parser_export.add_argument('version_info_file', nargs='?', type=pathlib.Path,
+        help='output file to save important autodetected info to (.json)')
     parser_export.set_defaults(func=handle_export)
 
     # def handle_import(pArgs):

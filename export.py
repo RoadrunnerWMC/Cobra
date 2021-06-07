@@ -1,6 +1,7 @@
 # 2021-05-15
 
 import enum
+import json
 import pathlib
 import struct
 import typing
@@ -155,9 +156,9 @@ def read_scripts(source: export_base.Source, analysis: export_base.Analysis) -> 
         script = common.LowLevelScript()
 
         # Read the entry from scripts table
-        if analysis.uses_categories:
+        if analysis.uses_priorities:
             source.seek(analysis.table_addr + i * 8)
-            script.category_id = source.read_u32()
+            script.priority = source.read_u32()
             script_addr = source.read_u32()
         else:
             script_addr = source.read_u32_from(analysis.table_addr + i * 4)
@@ -181,7 +182,109 @@ def read_scripts(source: export_base.Source, analysis: export_base.Analysis) -> 
     return scripts
 
 
-def do_export(input_file: pathlib.Path, scripts_file: pathlib.Path, addrs_file: pathlib.Path) -> None:
+def convert_to_high_level(low_level_scripts: list, analysis: export_base.Analysis) -> dict:
+    """
+    Convert a list of LowLevelScript to a dict of {name: HighLevelScript}
+    """
+    def get_script_info(id: int) -> dict:
+        """
+        Get the correct info dict for a script ID
+        """
+        variant = analysis.game_variant
+        while variant:
+            if id in variant.scripts.add:
+                return variant.scripts.add[id]
+            for ren in variant.scripts.renumber:
+                id = ren.apply(id)
+            variant = variant.parent
+        return {}
+
+    def get_command_info(id: int) -> dict:
+        """
+        Get the correct info dict for a command ID
+        """
+        variant = analysis.game_variant
+        while variant:
+            if id in variant.commands.add:
+                return variant.commands.add[id]
+            for ren in variant.commands.renumber:
+                id = ren.apply(id)
+            variant = variant.parent
+        return {}
+
+    high_level_scripts = {}
+    for i, script_low in enumerate(low_level_scripts):
+        script_info = get_script_info(i)
+
+        # Make HighLevelScript and add it to the dict by name
+        script_high = common.HighLevelScript()
+        high_level_scripts[script_info.get('name', f'scr_{i:03d}')] = script_high
+
+        script_high.priority = script_low.priority
+
+        for command_low in script_low:
+            command_info = get_command_info(command_low.id)
+
+            # Command ID (simple)
+            high_id = command_info.get('name', f'cmd_{command_low.id:03d}')
+
+            # Command arg (a little more complicated)
+            high_arg = None
+
+            # If the command is documented to have an argument...
+            if command_info.get('arg') is not None:
+                # Use a string from an enum if applicable
+                for name, value in command_info.get('enum', {}).items():
+                    if command_low.argument == value:
+                        high_arg = name
+                        break
+                else:
+                    # No enum matches, but the command *is* still
+                    # documented to have an argument, so add it here
+                    # whether it's zero or not
+                    high_arg = str(command_low.argument)
+
+            # Otherwise, only add the arg if it's nonzero
+            if high_arg is None and command_low.argument != 0:
+                high_arg = str(command_low.argument)
+
+            # Create HighLevelCommand and add it to the script
+            command_high = common.HighLevelCommand(high_id, high_arg)
+            script_high.append(command_high)
+
+    return high_level_scripts
+
+
+def convert_to_text(scripts: dict) -> str:
+    """
+    Convert a dict of scripts to a text-file string
+    """
+    ARG_COLUMN = 16
+
+    lines = []
+
+    for script_name, script in scripts.items():
+
+        lines.append(f'{script_name}:')
+
+        for cmd in script:
+            line = f'    {cmd.id}'
+
+            if cmd.argument:
+                if len(line) < ARG_COLUMN:
+                    line += ' ' * (ARG_COLUMN - len(line))
+                else:
+                    line += ' '
+                line += cmd.argument
+
+            lines.append(line)
+
+        lines.append('')
+
+    return '\n'.join(lines)
+
+
+def do_export(input_file: pathlib.Path, scripts_file: pathlib.Path, version_info_file: pathlib.Path) -> None:
     """
     Handle the "export" command (with all default parameter values filled in as needed)
     """
@@ -199,21 +302,38 @@ def do_export(input_file: pathlib.Path, scripts_file: pathlib.Path, addrs_file: 
         # Analyze
         analysis.analyze()
 
-        # Read scripts
-        scripts = read_scripts(source, analysis)
+        # Save analysis results
+        analysis_json = analysis.to_json()
+        with version_info_file.open('w', encoding='utf-8') as f:
+            json.dump(analysis_json, f, indent=4)
 
-        for i, s in enumerate(scripts):
-            print(f'ScriptCommand script_{i:03d}[] = {{')
-            for cmd in s:
-                print(f'    {{{cmd.id}, {cmd.argument}}},')
-            print('};')
-            print('')
+        # Read low-level (int-based) scripts
+        scripts_low = read_scripts(source, analysis)
 
-        print('')
-        print('ScriptsTableEntry custom_world_map_scripts_table[] = {')
-        for i, s in enumerate(scripts):
-            print(f'    {{{s.category_id}, script_{i:03d}}},')
-        print('};')
+        # Convert to high-level (str-based) scripts
+        scripts_high = convert_to_high_level(scripts_low, analysis)
 
-        variant = analysis.detect_game_variant()
-        print(variant.name)
+        # Save output
+        txt = convert_to_text(scripts_high)
+        with scripts_file.open('w', encoding='utf-8') as f:
+            f.write(txt)
+
+        # # TEMP: encode as .wms
+        # import encode
+        # wms_data = encode.create_wms({i: s for i, s in enumerate(scripts_low)}, endian='>', use_priorities=True)
+        # with pathlib.Path('out.wms').open('wb') as f:
+        #     f.write(wms_data)
+
+        # # TEMP: dump C++ source to stdout
+        # for i, s in enumerate(scripts_low):
+        #     print(f'ScriptCommand script_{i:03d}[] = {{')
+        #     for cmd in s:
+        #         print(f'    {{{cmd.id}, {cmd.argument}}},')
+        #     print('};')
+        #     print('')
+
+        # print('')
+        # print('ScriptsTableEntry custom_world_map_scripts_table[] = {')
+        # for i, s in enumerate(scripts_low):
+        #     print(f'    {{{s.priority}, script_{i:03d}}},')
+        # print('};')

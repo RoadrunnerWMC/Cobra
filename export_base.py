@@ -84,21 +84,22 @@ class SimpleRAMDumpSource(Source):
 class Analysis:
     """
     Base class for an analyzer that finds important addresses and constants.
-    Can be serialized to/from json.
     """
-    # Override this group statically in subclasses
-    uses_categories: bool = False
+    # Override this statically in subclasses
+    uses_priorities: bool = False
 
-    game_variant: game_variants.GameVariant
+    source: Source
 
+    static_init_func_addr: int
+    memory_overrides: dict
     table_addr: int
     table_length: int
     terminator_command: int
+    game_variant: game_variants.GameVariant
 
-    def __init__(self, source, table_addr:int=None):
+
+    def __init__(self, source):
         self.source = source
-        self.table_addr = table_addr
-
         self.memory_overrides = {}
 
 
@@ -180,7 +181,7 @@ class Analysis:
 
         for i in range(999):
             # Read table entry
-            if self.uses_categories:
+            if self.uses_priorities:
                 self.source.read_u32()  # skip past this
             this_ptr_in_table = self.source.read_u32()
 
@@ -205,7 +206,7 @@ class Analysis:
         in; see analyze() for the exact order.
         """
         # Get the address of the second script in the table
-        second_script_addr = self.source.read_u32_from(self.table_addr + (12 if self.uses_categories else 4))
+        second_script_addr = self.source.read_u32_from(self.table_addr + (12 if self.uses_priorities else 4))
 
         # Read the command ID preceding it -- i.e. the last command in the
         # *first* script
@@ -231,3 +232,19 @@ class Analysis:
         in; see analyze() for the exact order.
         """
         raise NotImplementedError
+
+
+    def to_json(self) -> dict:
+        """
+        Return a dict representing the analysis results required for
+        patching, which can be saved to a json file and later reused
+        as a stand-in for the source we just analyzed
+        """
+        return {
+            'game_variant': self.game_variant.id,
+
+            'static_init_func_addr': self.static_init_func_addr,
+            'table_addr': self.table_addr,
+            'table_length': self.table_length,
+            'terminator_command': self.terminator_command,
+        }

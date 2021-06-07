@@ -40,6 +40,7 @@ class RenumberingRange:
 
         return cls(range_start, range_end, offset)
 
+
     def apply(self, value: int) -> int:
         """
         Apply this renumbering to the value provided
@@ -72,12 +73,15 @@ class NumberedListDiff:
 
     @classmethod
     def read_from_json(cls, json_info: dict):
+        """
+        Create a NumberedListDiff from a dict read from a json
+        """
         renumber = []
         for key, value in json_info.get('renumber', {}).items():
             renumber.append(RenumberingRange.read_from_json(key, value))
 
-        add = convert_str_keys_to_int_keys(json_info.get('add', {}))
-        delete = convert_str_keys_to_int_keys(json_info.get('delete', {}))
+        add = common.convert_str_keys_to_int_keys(json_info.get('add', {}))
+        delete = common.convert_str_keys_to_int_keys(json_info.get('delete', {}))
 
         return cls(renumber, add, delete)
 
@@ -86,12 +90,14 @@ class GameVariant:
     """
     A specific version of a game (like "NSMBU 1.3.0")
     """
+    id: str
     parent: 'GameVariant' = None
     name: str = None
     scripts: NumberedListDiff
     commands: NumberedListDiff
 
-    def __init__(self, parent, name, scripts, commands):
+    def __init__(self, id: str, parent: str, name: 'GameVariant', scripts: NumberedListDiff, commands: NumberedListDiff):
+        self.id = id
         self.parent = parent
         self.name = name
         self.scripts = scripts
@@ -99,23 +105,14 @@ class GameVariant:
 
     @classmethod
     def read_from_json(cls, json_info: dict):
+        """
+        Create a GameVariant from a dict read from a json
+        """
         name = json_info.get('name')
         scripts = NumberedListDiff.read_from_json(json_info.get('scripts', {}))
         commands = NumberedListDiff.read_from_json(json_info.get('commands', {}))
 
-        return cls(None, name, scripts, commands)
-
-
-def convert_str_keys_to_int_keys(map: dict) -> dict:
-    """
-    JSON doesn't allow object keys to be ints, so the closest you can do
-    is strings containing ints written in base 10.
-    This function takes such a dict and 
-    """
-    new = {}
-    for key, value in map.items():
-        new[int(key)] = value
-    return new
+        return cls(None, None, name, scripts, commands)
 
 
 def load_game_json(game: common.Game) -> dict:
@@ -128,12 +125,14 @@ def load_game_json(game: common.Game) -> dict:
 
     # Load variants individually
     variants = {}
-    for name, variant_dict in j.items():
-        variants[name] = GameVariant.read_from_json(variant_dict)
+    for id, variant_dict in j.items():
+        variant = GameVariant.read_from_json(variant_dict)
+        variant.id = id
+        variants[id] = variant
 
     # Assign parents
-    for name, variant_dict in j.items():
-        variant = variants[name]
+    for id, variant_dict in j.items():
+        variant = variants[id]
         parent_name = variant_dict.get('parent')
         if parent_name:
             variant.parent = variants[parent_name]

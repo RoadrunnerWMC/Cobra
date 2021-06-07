@@ -15,6 +15,16 @@ def iter_bytes_matches(haystack: bytes, needle: bytes):
         idx = haystack.find(needle, idx + 1)
 
 
+def convert_str_keys_to_int_keys(map: dict) -> dict:
+    """
+    JSON doesn't allow object keys to be ints, so the closest you can do
+    is strings containing ints.
+    This function takes such a dict and converts it to one with actual
+    int keys. (Any base is allowed, i.e. you can do "0x1234ABCD".)
+    """
+    return {int(key, 0): value for key, value in map.items()}
+
+
 @enum.unique
 class Game(enum.Enum):
     """
@@ -25,9 +35,9 @@ class Game(enum.Enum):
     NSMBU = 'nsmbu'
     NSMBUDX = 'nsmbudx'
 
-    def uses_script_categories(self) -> bool:
+    def uses_script_priorities(self) -> bool:
         """
-        Only the games after NSMBW use the "categories" system
+        Only the games after NSMBW use a priority queue for scripts
         """
         return self is not Game.NSMBW
 
@@ -65,7 +75,7 @@ class LowLevelScript(list):
     """
     `list` subclass representing a "low-level" script -- a list of LowLevelCommand
     """
-    category_id: int = None
+    priority: int = None
 
 
 
@@ -87,5 +97,5 @@ class HighLevelScript(list):
     """
     `list` subclass representing a "high-level" script -- a list of HighLevelCommand
     """
-    category_id: int = None
+    priority: int = None
 
