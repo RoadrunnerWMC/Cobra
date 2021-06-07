@@ -241,6 +241,7 @@ class Analysis:
         as a stand-in for the source we just analyzed
         """
         return {
+            'game': self.game_variant.game.value,
             'game_variant': self.game_variant.id,
 
             'static_init_func_addr': self.static_init_func_addr,

@@ -6,14 +6,8 @@ import typing
 
 import common
 import docs
+import encode
 import export
-
-
-def do_import(scripts_file: pathlib.Path, cpp_file: pathlib.Path, add_ok:bool=False) -> None:
-    """
-    Handle the "import" command (with all default parameter values filled in as needed)
-    """
-    print(f'do_import({scripts_file}, {cpp_file}, {add_ok})')
 
 
 def main(argv:list=None) -> None:
@@ -46,26 +40,27 @@ def main(argv:list=None) -> None:
         help='output file to save important autodetected info to (.json)')
     parser_export.set_defaults(func=handle_export)
 
-    # def handle_import(pArgs):
-    #     """
-    #     Handle the "import" command.
-    #     """
-    #     scripts_file = pArgs.scripts_file
+    def handle_encode(pArgs):
+        """
+        Handle the "encode" command.
+        """
+        scripts_file = pArgs.scripts_file
+        version_info_file = pArgs.version_info_file
 
-    #     cpp_file = pArgs.cpp_file
-    #     if cpp_file is None: cpp_file = scripts_file.with_suffix('.cpp')
+        wms_file = pArgs.wms_file
+        if wms_file is None: wms_file = scripts_file.with_suffix('.wms')
 
-    #     do_import(scripts_file, cpp_file, pArgs.add_ok)
+        encode.do_encode(scripts_file, version_info_file, wms_file)
 
-    # parser_import = subparsers.add_parser('import', aliases=['i'],
-    #     help='convert a scripts file into a Kamek patch that can be used to import it')
-    # parser_import.add_argument('scripts_file', type=pathlib.Path,
-    #     help='input file containing one or more scripts')
-    # parser_import.add_argument('cpp_file', nargs='?', type=pathlib.Path,
-    #     help='output .cpp file to save the Kamek patch to')
-    # parser_import.add_argument('--add_ok', action='store_true',
-    #     help=f'if scripts with IDs higher than {NUM_RETAIL_SCRIPTS-1} are specified, handle it by creating a new, larger table instead of printing an error')
-    # parser_import.set_defaults(func=handle_import)
+    parser_encode = subparsers.add_parser('encode', aliases=['i'],
+        help='convert a scripts file to a .wms binary file')
+    parser_encode.add_argument('scripts_file', type=pathlib.Path,
+        help='input file containing one or more scripts')
+    parser_encode.add_argument('version_info_file', type=pathlib.Path,
+        help="a version-info file (.json) characterizing the particular version of the game you're going to be using this with")
+    parser_encode.add_argument('wms_file', nargs='?', type=pathlib.Path,
+        help='output .wms file to save to')
+    parser_encode.set_defaults(func=handle_encode)
 
     def handle_docs(pArgs):
         """

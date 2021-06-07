@@ -310,30 +310,10 @@ def do_export(input_file: pathlib.Path, scripts_file: pathlib.Path, version_info
         # Read low-level (int-based) scripts
         scripts_low = read_scripts(source, analysis)
 
-        # Convert to high-level (str-based) scripts
-        scripts_high = convert_to_high_level(scripts_low, analysis)
+    # Convert to high-level (str-based) scripts
+    scripts_high = convert_to_high_level(scripts_low, analysis)
 
-        # Save output
-        txt = convert_to_text(scripts_high)
-        with scripts_file.open('w', encoding='utf-8') as f:
-            f.write(txt)
-
-        # # TEMP: encode as .wms
-        # import encode
-        # wms_data = encode.create_wms({i: s for i, s in enumerate(scripts_low)}, endian='>', use_priorities=True)
-        # with pathlib.Path('out.wms').open('wb') as f:
-        #     f.write(wms_data)
-
-        # # TEMP: dump C++ source to stdout
-        # for i, s in enumerate(scripts_low):
-        #     print(f'ScriptCommand script_{i:03d}[] = {{')
-        #     for cmd in s:
-        #         print(f'    {{{cmd.id}, {cmd.argument}}},')
-        #     print('};')
-        #     print('')
-
-        # print('')
-        # print('ScriptsTableEntry custom_world_map_scripts_table[] = {')
-        # for i, s in enumerate(scripts_low):
-        #     print(f'    {{{s.priority}, script_{i:03d}}},')
-        # print('};')
+    # Save output
+    txt = convert_to_text(scripts_high)
+    with scripts_file.open('w', encoding='utf-8') as f:
+        f.write(txt)

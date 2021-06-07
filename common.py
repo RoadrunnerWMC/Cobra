@@ -57,6 +57,15 @@ class Game(enum.Enum):
         else:
             return self
 
+    def endian(self) -> str:
+        """
+        Return '>' or '<' for this game's endianness
+        """
+        if self in {Game.NSMBW, Game.NSMBU}:
+            return '>'
+        else:
+            return '<'
+
 
 @dataclasses.dataclass
 class LowLevelCommand:
@@ -64,7 +73,7 @@ class LowLevelCommand:
     Represents a "low-level" command -- an (ID, argument) pair, both ints.
     """
     id: int
-    argument: int
+    argument: int = 0
 
     def __init__(self, id: int, argument: int):
         self.id = id
@@ -75,7 +84,7 @@ class LowLevelScript(list):
     """
     `list` subclass representing a "low-level" script -- a list of LowLevelCommand
     """
-    priority: int = None
+    priority: int = 0
 
 
 

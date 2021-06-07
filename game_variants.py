@@ -91,6 +91,7 @@ class GameVariant:
     A specific version of a game (like "NSMBU 1.3.0")
     """
     id: str
+    game: common.Game
     parent: 'GameVariant' = None
     name: str = None
     scripts: NumberedListDiff
@@ -128,6 +129,7 @@ def load_game_json(game: common.Game) -> dict:
     for id, variant_dict in j.items():
         variant = GameVariant.read_from_json(variant_dict)
         variant.id = id
+        variant.game = game
         variants[id] = variant
 
     # Assign parents
