@@ -26,35 +26,24 @@ def main(argv:list=None) -> None:
         """
         Handle the "export" command.
         """
-        game = common.Game(pArgs.game)
-
         input_file = pArgs.input_file
 
         scripts_file = pArgs.scripts_file
         if scripts_file is None: scripts_file = input_file.with_suffix('.txt')
 
-        table_addr_str = pArgs.table_addr
-        if table_addr_str is None:  # (meaning "autodetect address")
-            table_addr = None
-        else:
-            try:
-                table_addr = int(table_addr_str, 16)
-            except ValueError:
-                print(f'ERROR: Could not read "{table_addr_str}" as a hexadecimal number.')
-                return
+        addrs_file = pArgs.addrs_file
+        if addrs_file is None: addrs_file = input_file.with_suffix('.json')
 
-        export.do_export(game, input_file, scripts_file, table_addr)
+        export.do_export(input_file, scripts_file, addrs_file)
 
     parser_export = subparsers.add_parser('export', aliases=['e'],
-        help='export all scripts from a code file (NSMBW-only) or memory dump')
-    parser_export.add_argument('game', choices=[g.value for g in common.Game],
-        help='which game to work with')
+        help='export all scripts from a code file or memory dump')
     parser_export.add_argument('input_file', type=pathlib.Path,
         help='file to read scripts from')
     parser_export.add_argument('scripts_file', nargs='?', type=pathlib.Path,
-        help='output text file to save scripts to')
-    parser_export.add_argument('--table_addr',
-        help='address of scripts table (hexadecimal) (will be auto-detected if not specified)')
+        help='output file to save scripts to (.txt)')
+    parser_export.add_argument('addrs_file', nargs='?', type=pathlib.Path,
+        help='output file to save important autodetected addresses to (.json)')
     parser_export.set_defaults(func=handle_export)
 
     # def handle_import(pArgs):

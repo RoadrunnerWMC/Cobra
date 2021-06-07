@@ -6,12 +6,6 @@ import export_base
 import game_variants
 
 
-def iter_bytes_matches(haystack: bytes, needle: bytes):
-    idx = haystack.find(needle)
-    while idx != -1:
-        yield idx
-        idx = haystack.find(needle, idx + 1)
-
 
 class TheWorldsWorstPowerPCInterpreter:
     """
@@ -28,8 +22,7 @@ class TheWorldsWorstPowerPCInterpreter:
         Run the function at addr up to the blr
         """
         for i in range(9999):
-            self.source.seek(addr)
-            inst, = struct.unpack('>I', self.source.read(4))
+            inst = self.source.read_u32_from(addr)
 
             if inst == 0x4E800020:  # blr
                 return
@@ -103,7 +96,7 @@ class RPXSection:
     """
     Abstract base class for a RPX section
     """
-    def __init__(self, file, flags, addr, offset, size):
+    def __init__(self, file, flags: int, addr: int, offset: int, size: int):
         self.file = file
         self.addr = addr
 
@@ -134,7 +127,7 @@ class RPXSectionUncompressed(RPXSection):
     Uncompressed RPX section. This is just a thin wrapper around the
     file-like object, since we can read from it directly
     """
-    def __init__(self, file, flags, addr, offset, size):
+    def __init__(self, file, flags: int, addr: int, offset: int, size: int):
         super().__init__(file, flags, addr, offset, size)
         self.addr = addr
         self.offset = offset
@@ -167,11 +160,11 @@ class RPXSectionCompressed(RPXSection):
     Compressed RPX section. This class is lazy, decompressing the
     section data only if .read() is called.
     """
-    def __init__(self, file, flags, addr, offset, size):
+    def __init__(self, file, flags: int, addr: int, offset: int, size: int):
         super().__init__(file, flags, addr, offset, size)
         self.addr = addr
 
-        self.decompressed_yet = False
+        self._decompressed_yet = False
         self.offset = offset
         self.size = size
 
@@ -188,17 +181,17 @@ class RPXSectionCompressed(RPXSection):
         return self.addr <= addr < self.addr + self.decomp_size
 
 
-    def ensure_decompressed(self):
+    def _ensure_decompressed(self):
         """
         If the data hasn't been decompressed yet, decompress it.
         Otherwise do nothing.
         """
-        if self.decompressed_yet: return
+        if self._decompressed_yet: return
 
         self.file.seek(self.offset + 4)
         self.decomp_data = zlib.decompress(self.file.read(self.size - 4))
 
-        self.decompressed_yet = True
+        self._decompressed_yet = True
 
 
     def seek(self, addr: int):
@@ -212,7 +205,7 @@ class RPXSectionCompressed(RPXSection):
         """
         Like file.read()
         """
-        self.ensure_decompressed()
+        self._ensure_decompressed()
         data = self.decomp_data[self.cursor : self.cursor + amount]
         self.cursor += amount
         return data
@@ -222,6 +215,9 @@ class RPXFileSource(export_base.Source):
     """
     Source subclass for an RPX file
     """
+    endian = '>'
+    needs_interpreter = True
+
     def __init__(self, file):
         super().__init__(file)
 
@@ -279,10 +275,10 @@ class RPXFileSource(export_base.Source):
 
 class CemuRAMDumpSource(export_base.SimpleRAMDumpSource):
     """
-    SimpleRAMDumpSource subclass for a Cemu ram dump
+    SimpleRAMDumpSource subclass for a Cemu RAM dump
     """
-    def __init__(self, file):
-        super().__init__(file, 0x02000000, '>')
+    endian = '>'
+    base_address = 0x02000000
 
 
 class NSMBUAnalysis(export_base.Analysis):
@@ -290,94 +286,6 @@ class NSMBUAnalysis(export_base.Analysis):
     Analysis subclass for NSMBU
     """
     uses_categories = True
-    endianness = '>'
-
-    def __init__(self, source):
-        super().__init__(source)
-
-        # TODO: integrate this stuff better into the base class .analyze()
-
-        if isinstance(source, RPXFileSource):
-            static_init_addr = self.find_static_init_func()
-
-            interpreter = TheWorldsWorstPowerPCInterpreter(source)
-            interpreter.run_function_at(static_init_addr)
-            self.memory_overrides = interpreter.memory
-
-        else:
-            self.memory_overrides = {}
-
-
-    def read_commands_u32(self, addr: int) -> int:
-        """
-        Read a u32 from an address, possibly from self.memory_overrides
-        if there's an entry for it there
-        """
-        if addr in self.memory_overrides:
-            return self.memory_overrides[addr]
-        else:
-            self.source.seek(addr)
-            return struct.unpack('>I', self.source.read(4))[0]
-
-
-    def find_table_addr(self) -> int:
-        """
-        Auto-detect the address of the scripts table in memory (e.g. 0x10044a98 for NSMBU 1.0.0 US).
-        Return None if not found.
-        """
-        # Find "TalkWindow_Sign_00", which is an easily identified string
-        # a few hundred bytes before the start of the table
-        window_base = self.source.search(
-            b'TalkWindow_Sign_00', 0x10000000, 0x11000000)
-
-        if window_base is None:
-            # :(
-            return None
-
-        # Read a "window" of 0x1000 bytes starting at that point
-        # (this is more than enough to contain the whole table)
-        self.source.seek(window_base)
-        window = self.source.read(0x1000)
-
-        # Look for a specific byte pattern that indicates the start of the table
-        # (the first script's category, and the most-significant byte of its pointer)
-        TABLE_START = bytes.fromhex('00 00 00 FF 10')
-
-        for offs in range(0, len(window), 4):
-            if window[offs : offs+len(TABLE_START)] == TABLE_START:
-                return window_base + offs
-
-
-    def find_table_length(self) -> int:
-        """
-        Auto-detect the number of entries in the scripts table (e.g. 119 for NSMBU 1.0.0 US).
-        Return None if not found.
-        """
-        self.source.seek(self.table_addr)
-        table = self.source.read(0x1000)
-
-        # Look for null entry, i.e. 8 null bytes
-        for i in range(len(table) // 8):
-            if table[i*8 : (i+1)*8] == b'\0' * 8:
-                return i
-
-
-    def find_terminator_command_id(self) -> int:
-        """
-        Auto-detect the terminator command ID (e.g. 341 for NSMBU 1.0.0 US).
-        Return None if not found.
-        """
-        # Get the address of the second script in the table
-        self.source.seek(self.table_addr + 12)
-        second_script_addr, = struct.unpack_from('>I', self.source.read(4))
-
-        # Read the command ID preceding it -- i.e. the last command in the
-        # *first* script
-        first_script_last_cmd = self.read_commands_u32(second_script_addr - 8)
-
-        # That must be the terminator command
-        return first_script_last_cmd
-
 
     def find_static_init_func(self) -> int:
         """
@@ -448,7 +356,7 @@ class NSMBUAnalysis(export_base.Analysis):
             self.source.seek(block_start_addr)
             block = self.source.read(BLOCK_SIZE)
 
-            for idx in iter_bytes_matches(block, BLR_BYTES):
+            for idx in common.iter_bytes_matches(block, BLR_BYTES):
                 if idx % 4 != 0: continue  # if it's not aligned, it's
                                            # not actually an instruction
 
@@ -457,20 +365,49 @@ class NSMBUAnalysis(export_base.Analysis):
                     return func_start
 
 
+    def run_interpreter(self) -> dict:
+        """
+        Run an interpreter on the static init func to recover relevant
+        memory overrides.
+        Return a dict mapping memory addresses to u32 values.
+        """
+        interpreter = TheWorldsWorstPowerPCInterpreter(self.source)
+        interpreter.run_function_at(self.static_init_func_addr)
+        return interpreter.memory
+
+
+    def find_table_addr(self) -> int:
+        """
+        Auto-detect the address of the scripts table in memory (e.g.
+        0x10044a98 for NSMBU 1.0.0 US).
+        Return None if not found.
+        """
+        # Find "TalkWindow_Sign_00", which is an easily identified string
+        # a few hundred bytes before the start of the table
+        window_base = self.source.search(
+            b'TalkWindow_Sign_00', 0x10000000, 0x11000000)
+
+        if window_base is None:
+            # :(
+            return None
+
+        # Read a "window" of 0x1000 bytes starting at that point
+        # (this is more than enough to contain the whole table)
+        self.source.seek(window_base)
+        window = self.source.read(0x1000)
+
+        # Look for a specific byte pattern that indicates the start of the table
+        # (the first script's category, and the most-significant byte of its pointer)
+        TABLE_START = bytes.fromhex('00 00 00 FF 10')
+
+        for offs in range(0, len(window), 4):
+            if window[offs : offs+len(TABLE_START)] == TABLE_START:
+                return window_base + offs
+
+
     def find_static_init_hook_point(self) -> int:
         """
         Auto-detect the address in the static init function at which we can hook.
-        Some self-fields are guaranteed to have been previously filled
-        in; see analyze() for the exact order.
-        """
-        static_init_addr = self.find_static_init_func()
-        # TODO: write this function
-        return 0
-
-
-    def find_table_read_hook_point(self) -> int:
-        """
-        Auto-detect the address in the table-read function at which we can hook.
         Some self-fields are guaranteed to have been previously filled
         in; see analyze() for the exact order.
         """

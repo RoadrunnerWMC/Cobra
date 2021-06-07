@@ -1,5 +1,5 @@
 {
-    "root": {
+    "gold": {
         "scripts": {
             "add": {
                 "0": {"name": "enter_level"},

@@ -17,16 +17,25 @@ class SourceType(enum.Enum):
     """
     Different things we're able to read scripts from
     """
-    # Strings here are used in error messages, so they should look nice
-    DOLPHIN_RAM_DUMP_FOLDER = 'Dolphin RAM dump folder'
-    DOLPHIN_RAM_DUMP_FILE = 'Dolphin RAM dump file'
-    CITRA_RAM_DUMP_FOLDER = 'Citra RAM dump folder'
-    CITRA_RAM_DUMP_FILE = 'Citra RAM dump file'
-    CEMU_RAM_DUMP_FOLDER = 'Cemu RAM dump folder'
-    CEMU_RAM_DUMP_FILE = 'Cemu RAM dump file'
+    # Strings here are used in error messages, so they should look nice.
+
+    # Wii
     DOL_FILE = 'DOL file'
     ALF_FILE = 'ALF file'
+    DOLPHIN_RAM_DUMP_FOLDER = 'Dolphin RAM dump folder'
+    DOLPHIN_RAM_DUMP_FILE = 'Dolphin RAM dump file'
+
+    # 3DS
+    CITRA_RAM_DUMP_FOLDER = 'Citra RAM dump folder'
+    CITRA_RAM_DUMP_FILE = 'Citra RAM dump file'
+
+    # Wii U
     RPX_FILE = 'RPX file'
+    CEMU_RAM_DUMP_FOLDER = 'Cemu RAM dump folder'
+    CEMU_RAM_DUMP_FILE = 'Cemu RAM dump file'
+
+    # Switch
+    ...
 
     def game(self) -> common.Game:
         """
@@ -34,7 +43,7 @@ class SourceType(enum.Enum):
         """
         if self in {self.CITRA_RAM_DUMP_FOLDER, self.CITRA_RAM_DUMP_FILE}:
             return common.Game.NSMB2
-        elif self in {self.CEMU_RAM_DUMP_FOLDER, self.CEMU_RAM_DUMP_FILE, self.RPX_FILE}:
+        elif self in {self.RPX_FILE, self.CEMU_RAM_DUMP_FOLDER, self.CEMU_RAM_DUMP_FILE}:
             return common.Game.NSMBU
         else:
             return common.Game.NSMBW
@@ -76,15 +85,16 @@ def detect_source_type(path: pathlib.Path) -> SourceType:
     if path.is_dir():
         if (path / 'mem2.raw').is_file():
             return SourceType.DOLPHIN_RAM_DUMP_FOLDER
-        # TODO: Citra folder
+        # TODO: Citra ram dump folder
         elif (path / '02000000.bin').is_file():
             return SourceType.CEMU_RAM_DUMP_FOLDER
 
     elif path.is_file():
         size = path.stat().st_size
+
         if size == 0x04000000:  # 64 MB
             return SourceType.DOLPHIN_RAM_DUMP_FILE
-        # TODO: Citra file
+        # TODO: Citra ram dump file
         elif size == 0x4e000000:  # ~ 1.2 GB
             return SourceType.CEMU_RAM_DUMP_FILE
 
@@ -95,16 +105,35 @@ def detect_source_type(path: pathlib.Path) -> SourceType:
         if first_0x100[:4] == b'\x7fELF':
             return SourceType.RPX_FILE
 
+        if first_0x100[:4] == b'RBOF':
+            return SourceType.ALF_FILE
+
         if detect_dol_from_header(first_0x100):
             return SourceType.DOL_FILE
 
-        # TODO: ALF
+
+def resolve_folder_source_to_file(path: pathlib.Path, source_type: SourceType) -> (pathlib.Path, SourceType):
+    """
+    If the source is a folder containing the file we actually want,
+    adjust the path and source type appropriately
+    """
+    if source_type is SourceType.DOLPHIN_RAM_DUMP_FOLDER:
+        return (path / 'mem2.raw'), SourceType.DOLPHIN_RAM_DUMP_FILE
+
+    elif source_type is SourceType.CITRA_RAM_DUMP_FOLDER:
+        raise NotImplementedError
+
+    elif source_type is SourceType.CEMU_RAM_DUMP_FOLDER:
+        return (path / '02000000.bin'), SourceType.CEMU_RAM_DUMP_FILE
+
+    else:
+        return path, source_type
 
 
 def make_source_and_analysis(source_type: SourceType, file) -> (export_base.Source, export_base.Analysis):
     """
     Create instances of the appropriate Source and Analysis subclasses
-    for a file representing the specified source_type
+    for a file-like object representing the specified source_type
     """
     if source_type is SourceType.RPX_FILE:
         source = export_nsmbu.RPXFileSource(file)
@@ -114,7 +143,7 @@ def make_source_and_analysis(source_type: SourceType, file) -> (export_base.Sour
         source = export_nsmbu.CemuRAMDumpSource(file)
         return source, export_nsmbu.NSMBUAnalysis(source)
 
-    raise NotImplementedError
+    raise NotImplementedError(f'Not yet implemented: {source_type.value}')
 
 
 def read_scripts(source: export_base.Source, analysis: export_base.Analysis) -> list:
@@ -125,19 +154,19 @@ def read_scripts(source: export_base.Source, analysis: export_base.Analysis) -> 
     for i in range(analysis.table_length):
         script = common.LowLevelScript()
 
-        # Read entry from scripts table
+        # Read the entry from scripts table
         if analysis.uses_categories:
             source.seek(analysis.table_addr + i * 8)
-            script.category_id, script_addr = struct.unpack_from(f'{analysis.endianness}II', source.read(8))
+            script.category_id = source.read_u32()
+            script_addr = source.read_u32()
         else:
-            source.seek(analysis.table_addr + i * 4)
-            script_addr, = struct.unpack_from(f'{analysis.endianness}I', source.read(4))
+            script_addr = source.read_u32_from(analysis.table_addr + i * 4)
 
-        # Read script itself
+        # Read the script itself
         source.seek(script_addr)
-        for i in range(999):
-            command_id = analysis.read_commands_u32(script_addr + i * 8 + 0)
-            arg = analysis.read_commands_u32(script_addr + i * 8 + 4)
+        for j in range(999):
+            command_id = analysis.read_commands_u32_from(script_addr + j * 8 + 0)
+            arg = analysis.read_commands_u32_from(script_addr + j * 8 + 4)
 
             script.append(common.LowLevelCommand(command_id, arg))
 
@@ -145,29 +174,32 @@ def read_scripts(source: export_base.Source, analysis: export_base.Analysis) -> 
                 break
 
         else:
-            print('WARNING: Terminator not found')
+            print(f'WARNING: Terminator not found (script {i})')
 
         scripts.append(script)
 
     return scripts
 
 
-def do_export(game: common.Game, input_file: pathlib.Path, scripts_file: pathlib.Path, table_addr:int=None) -> None:
+def do_export(input_file: pathlib.Path, scripts_file: pathlib.Path, addrs_file: pathlib.Path) -> None:
     """
     Handle the "export" command (with all default parameter values filled in as needed)
     """
     source_type = detect_source_type(input_file)
 
-    # Sanity check: check that the input type matches the game the user asked for
-    if source_type.game() is not game:
-        raise ValueError(f"You requested scripts for {game.value}, but gave a {source_type.value} as input, which would be for {source_type.game().value}...")
-
-    # TODO: deal with folders here
+    # If the user specified a folder (like a Dolphin or Cemu RAM dump
+    # folder), get the actual file instead
+    input_file, source_type = \
+        resolve_folder_source_to_file(input_file, source_type)
 
     with input_file.open('rb') as f:
+        # Create the appropriate source and analysis classes
         source, analysis = make_source_and_analysis(source_type, f)
+
+        # Analyze
         analysis.analyze()
 
+        # Read scripts
         scripts = read_scripts(source, analysis)
 
         for i, s in enumerate(scripts):

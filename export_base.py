@@ -11,7 +11,8 @@ class Source:
     Source base class. Essentially a wrapper around a file object, which
     is capable of "seeking" to particular memory addresses.
     """
-    endian = '>'
+    endian: str
+    needs_interpreter: bool = False
 
     def __init__(self, file):
         self.file = file
@@ -55,14 +56,26 @@ class Source:
         return self.file.read(amount)
 
 
+    def read_u32(self) -> int:
+        """
+        Convenience function to read a u32.
+        """
+        return struct.unpack(f'{self.endian}I', self.read(4))[0]
+
+
+    def read_u32_from(self, addr: int) -> int:
+        """
+        Convenience function to read a u32 from a given address.
+        """
+        self.seek(addr)
+        return self.read_u32()
+
+
 class SimpleRAMDumpSource(Source):
     """
     Basic source that just interprets the file as a RAM dump from some base address
     """
-    def __init__(self, file, base_address: int, endianness: str):
-        super().__init__(file)
-        self.base_address = base_address
-        self.endian = endianness
+    base_address: int
 
     def seek(self, addr: int):
         self.file.seek(addr - self.base_address)
@@ -74,8 +87,7 @@ class Analysis:
     Can be serialized to/from json.
     """
     # Override this group statically in subclasses
-    uses_categories = False
-    endianness: str
+    uses_categories: bool = False
 
     game_variant: game_variants.GameVariant
 
@@ -83,43 +95,64 @@ class Analysis:
     table_length: int
     terminator_command: int
 
-    @dataclasses.dataclass
-    class HookPoint:
-        address: int
-        original_instruction: int
-
-    static_init_hook_point: HookPoint
-    table_read_hook_point: HookPoint
-
     def __init__(self, source, table_addr:int=None):
         self.source = source
         self.table_addr = table_addr
 
+        self.memory_overrides = {}
 
-    def read_commands_u32(self, addr: int) -> int:
+
+    def read_commands_u32_from(self, addr: int) -> int:
         """
         Use this instead of self.source.seek()/.read() when reading the
         commands lists data. This lets subclasses fill in extra data
         derived from the static init functions (NSMB2, NSMBU).
         """
-        self.source.seek(addr)
-        return struct.unpack('>I', self.source.read(4))[0]
+        if addr in self.memory_overrides:
+            return self.memory_overrides[addr]
+        else:
+            return self.source.read_u32_from(addr)
 
 
     def analyze(self):
         """
         Call all the analysis functions
         """
-        if self.table_addr is None:
-            self.table_addr = self.find_table_addr()
+        # Find the static init func
+        self.static_init_func_addr = self.find_static_init_func()
 
+        # Interpret it if needed, to populate self.memory_overrides
+        if self.source.needs_interpreter:
+            self.memory_overrides = self.run_interpreter()
+
+        # Find basic info about the main table
+        self.table_addr = self.find_table_addr()
         self.table_length = self.find_table_length()
         self.terminator_command = self.find_terminator_command_id()
 
-        self.static_init_hook_point = self.find_static_init_hook_point()
-        self.table_read_hook_point = self.find_table_read_hook_point()
+        # Find hook points
+        ...
 
+        # Finally, classify the game variant we're looking at
         self.game_variant = self.detect_game_variant()
+
+
+    def find_static_init_func(self) -> int:
+        """
+        Auto-detect the static init function address.
+        Some self-fields are guaranteed to have been previously filled
+        in; see analyze() for the exact order.
+        """
+        raise NotImplementedError
+
+
+    def run_interpreter(self) -> dict:
+        """
+        Run an interpreter on the static init func to recover relevant
+        memory overrides.
+        Return a dict mapping memory addresses to u32 values.
+        """
+        raise NotImplementedError
 
 
     def find_table_addr(self) -> int:
@@ -136,7 +169,33 @@ class Analysis:
         Some self-fields are guaranteed to have been previously filled
         in; see analyze() for the exact order.
         """
-        raise NotImplementedError
+        # We detect the end of the scripts table as when the addresses
+        # suddenly change by more than a maximum threshold.
+        # This strategy works for all of the games.
+        CHANGE_THRESHOLD = 0x10000
+        DEFAULT_IF_UNDETECTABLE = 10  # arbitrary safe small number
+
+        prev_ptr_in_table = None
+        self.source.seek(self.table_addr)
+
+        for i in range(999):
+            # Read table entry
+            if self.uses_categories:
+                self.source.read_u32()  # skip past this
+            this_ptr_in_table = self.source.read_u32()
+
+            # If it's more than CHANGE_THRESHOLD away from the previous,
+            # we're done
+            if prev_ptr_in_table is not None:
+                if abs(this_ptr_in_table - prev_ptr_in_table) > CHANGE_THRESHOLD:
+                    return i
+
+            # Prepare for next iteration
+            prev_ptr_in_table = this_ptr_in_table
+
+        else:
+            print(f"WARNING: Couldn't determine scripts table length -- defaulting to {DEFAULT_IF_UNDETECTABLE}")
+            return DEFAULT_IF_UNDETECTABLE
 
 
     def find_terminator_command_id(self) -> int:
@@ -145,21 +204,20 @@ class Analysis:
         Some self-fields are guaranteed to have been previously filled
         in; see analyze() for the exact order.
         """
-        raise NotImplementedError
+        # Get the address of the second script in the table
+        second_script_addr = self.source.read_u32_from(self.table_addr + (12 if self.uses_categories else 4))
+
+        # Read the command ID preceding it -- i.e. the last command in the
+        # *first* script
+        first_script_last_cmd = self.read_commands_u32_from(second_script_addr - 8)
+
+        # That must be the terminator command
+        return first_script_last_cmd
 
 
     def find_static_init_hook_point(self) -> int:
         """
         Auto-detect the address in the static init function at which we can hook.
-        Some self-fields are guaranteed to have been previously filled
-        in; see analyze() for the exact order.
-        """
-        raise NotImplementedError
-
-
-    def find_table_read_hook_point(self) -> int:
-        """
-        Auto-detect the address in the table-read function at which we can hook.
         Some self-fields are guaranteed to have been previously filled
         in; see analyze() for the exact order.
         """

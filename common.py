@@ -4,6 +4,17 @@ import dataclasses
 import enum
 
 
+def iter_bytes_matches(haystack: bytes, needle: bytes):
+    """
+    Given a big bytes object and a small one, iterate over indices at
+    which the small one is a substring of the big one
+    """
+    idx = haystack.find(needle)
+    while idx != -1:
+        yield idx
+        idx = haystack.find(needle, idx + 1)
+
+
 @enum.unique
 class Game(enum.Enum):
     """

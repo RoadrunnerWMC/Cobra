@@ -1,6 +1,6 @@
 # World Map Scripts in NSMBU
 
-**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbu" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2021-06-01T02:52:32.507121.)
+**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbu" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2021-06-07T00:10:31.397842.)
 
 ## Introduction
 
@@ -34,6 +34,8 @@ Version | Scripts table address (US) | Number of scripts | Terminator command
 TODO: add some info about NSMBUDX
 
 ## Scripts
+
+### 1.0.0
 
 ID | Name | Description
 -- | ---- | -----------
@@ -165,6 +167,8 @@ ID | Name | Description
 **120** | ?? | -
 
 ## Commands
+
+### 1.0.0
 
 ID | Name | Description | Argument
 -- | ---- | ----------- | --------

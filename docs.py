@@ -117,10 +117,11 @@ def generate_md_commands_table(game: common.Game, commands: dict) -> list:
 
 
 def generate_md_sections_for_variants(game: common.Game, variants: dict, attr_name: str, table_renderer) -> list:
+    """
+    A helper function to generate sections showing all variants'
+    versions of some attribute ("scripts" or "commands")
+    """
     lines = []
-
-    if 'root' not in variants:
-        raise ValueError(f'No root variant for {game.value}')
 
     for name, variant in variants.items():
         thing = getattr(variant, attr_name)
@@ -128,7 +129,7 @@ def generate_md_sections_for_variants(game: common.Game, variants: dict, attr_na
         if not thing.renumber and not thing.add and not thing.delete:
             continue
 
-        if name != 'root':
+        if len(variants) > 1:
             lines.append(f'### {variant.name}')
             lines.append('')
 
