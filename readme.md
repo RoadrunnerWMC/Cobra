@@ -1,4 +1,4 @@
-# Cobra (working title)
+# Cobra
 
 A tool for exporting and importing world map scripts in NSMBW, NSMB2, NSMBU, and NSMBUDX.
 
