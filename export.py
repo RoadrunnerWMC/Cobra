@@ -265,7 +265,10 @@ def convert_to_text(scripts: dict) -> str:
 
     for script_name, script in scripts.items():
 
-        lines.append(f'{script_name}:')
+        if script.priority:
+            lines.append(f'{script_name} [priority={script.priority}]:')
+        else:
+            lines.append(f'{script_name}:')
 
         for cmd in script:
             line = f'    {cmd.id}'

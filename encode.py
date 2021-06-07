@@ -11,7 +11,7 @@ RE_SCRIPT_HEADER_LINE = re.compile(
     r'(?P<name>\w+)'      # name
     r'\s*'                # (optional whitespace)
     r'(?:'                # optional group for priority value
-    r','                  # | literal ","
+    r'\['                 # | literal "["
     r'\s*'                # | (optional whitespace)
     r'priority'           # | literal "priority"
     r'\s*'                # | (optional whitespace)
@@ -19,6 +19,7 @@ RE_SCRIPT_HEADER_LINE = re.compile(
     r'\s*'                # | (optional whitespace)
     r'(?P<priority>\d+)'  # | priority value
     r'\s*'                # | (optional whitespace)
+    r'\]'                 # | literal "]"
     r')?'                 # (ending the group)
     r':'                  # literal ":"
 )
