@@ -198,7 +198,6 @@ class Analysis:
         # suddenly change by more than a maximum threshold.
         # This strategy works for all of the games.
         CHANGE_THRESHOLD = 0x10000
-        DEFAULT_IF_UNDETECTABLE = 10  # arbitrary safe small number
 
         prev_ptr_in_table = None
         self.source.seek(self.table_addr)
@@ -217,10 +216,6 @@ class Analysis:
 
             # Prepare for next iteration
             prev_ptr_in_table = this_ptr_in_table
-
-        else:
-            print(f"WARNING: Couldn't determine scripts table length -- defaulting to {DEFAULT_IF_UNDETECTABLE}")
-            return DEFAULT_IF_UNDETECTABLE
 
 
     def find_terminator_command_id(self) -> int:
