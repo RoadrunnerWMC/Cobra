@@ -115,27 +115,49 @@ class Analysis:
             return self.source.read_u32_from(addr)
 
 
-    def analyze(self):
+    def analyze(self, *, verbose=True):
         """
         Call all the analysis functions
         """
+        def vprint(*args, **kwargs):
+            if verbose:
+                return print(*args, **kwargs)
+
         # Find the static init func
         self.static_init_func_addr = self.find_static_init_func()
+        if self.static_init_func_addr is None:
+            raise ValueError("Couldn't find static init function")
+        vprint(f'Static init function: {self.static_init_func_addr:08x}')
 
         # Interpret it if needed, to populate self.memory_overrides
         if self.source.needs_interpreter:
             self.memory_overrides = self.run_interpreter()
+            vprint(f'Interpreter created {len(self.memory_overrides)} memory overrides')
 
         # Find basic info about the main table
         self.table_addr = self.find_table_addr()
+        if self.table_addr is None:
+            raise ValueError("Couldn't find scripts table")
+        vprint(f'Scripts table: {self.table_addr:08x}')
+
         self.table_length = self.find_table_length()
+        if self.table_length is None:
+            raise ValueError("Couldn't determine scripts table length")
+        vprint(f'Scripts table length: {self.table_length}')
+
         self.terminator_command = self.find_terminator_command_id()
+        if self.terminator_command is None:
+            raise ValueError("Couldn't determine script terminator command")
+        vprint(f'Terminator command: {self.terminator_command}')
 
         # Find hook points
         ...
 
         # Finally, classify the game variant we're looking at
         self.game_variant = self.detect_game_variant()
+        if self.game_variant is None:
+            raise ValueError("Couldn't determine game variant")
+        vprint(f'Game variant: {self.game_variant.name}')
 
 
     def find_static_init_func(self) -> int:

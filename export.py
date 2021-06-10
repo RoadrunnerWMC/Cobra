@@ -287,6 +287,28 @@ def convert_to_text(scripts: dict) -> str:
     return '\n'.join(lines)
 
 
+def do_analyze(input_file: pathlib.Path) -> None:
+    """
+    Handle the "analyze" command
+    """
+    print(f'Analyzing "{input_file.name}"...')
+
+    source_type = detect_source_type(input_file)
+    print(f'Source type: {source_type.value}')
+
+    # If the user specified a folder (like a Dolphin or Cemu RAM dump
+    # folder), get the actual file instead
+    input_file, source_type = \
+        resolve_folder_source_to_file(input_file, source_type)
+
+    with input_file.open('rb') as f:
+        # Create the appropriate source and analysis classes
+        source, analysis = make_source_and_analysis(source_type, f)
+
+        # Analyze
+        analysis.analyze(verbose=True)
+
+
 def do_export(input_file: pathlib.Path, scripts_file: pathlib.Path, version_info_file: pathlib.Path) -> None:
     """
     Handle the "export" command (with all default parameter values filled in as needed)

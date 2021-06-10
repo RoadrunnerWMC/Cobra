@@ -16,6 +16,20 @@ def main(argv:list=None) -> None:
     subparsers = parser.add_subparsers(title='commands',
         description='(run a command with -h for additional help)')
 
+    def handle_analyze(pArgs):
+        """
+        Handle the "analyze" command.
+        """
+        input_file = pArgs.input_file
+
+        export.do_analyze(input_file)
+
+    parser_analyze = subparsers.add_parser('analyze', aliases=['a'],
+        help='analyze a code file or memory dump, and print findings')
+    parser_analyze.add_argument('input_file', type=pathlib.Path,
+        help='file to inspect')
+    parser_analyze.set_defaults(func=handle_analyze)
+
     def handle_export(pArgs):
         """
         Handle the "export" command.
@@ -30,7 +44,7 @@ def main(argv:list=None) -> None:
 
         export.do_export(input_file, scripts_file, version_info_file)
 
-    parser_export = subparsers.add_parser('export', aliases=['e'],
+    parser_export = subparsers.add_parser('export', aliases=['ex'],
         help='export all scripts from a code file or memory dump')
     parser_export.add_argument('input_file', type=pathlib.Path,
         help='file to read scripts from')
@@ -52,7 +66,7 @@ def main(argv:list=None) -> None:
 
         encode.do_encode(scripts_file, version_info_file, wms_file)
 
-    parser_encode = subparsers.add_parser('encode', aliases=['i'],
+    parser_encode = subparsers.add_parser('encode', aliases=['en'],
         help='convert a scripts file to a .wms binary file')
     parser_encode.add_argument('scripts_file', type=pathlib.Path,
         help='input file containing one or more scripts')
