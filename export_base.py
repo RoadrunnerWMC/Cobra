@@ -87,6 +87,7 @@ class Analysis:
     """
     # Override this statically in subclasses
     uses_priorities: bool = False
+    uses_static_init_func: bool = False
 
     source: Source
 
@@ -123,16 +124,17 @@ class Analysis:
             if verbose:
                 return print(*args, **kwargs)
 
-        # Find the static init func
-        self.static_init_func_addr = self.find_static_init_func()
-        if self.static_init_func_addr is None:
-            raise ValueError("Couldn't find static init function")
-        vprint(f'Static init function: {self.static_init_func_addr:08x}')
+        if self.uses_static_init_func:
+            # Find the static init func
+            self.static_init_func_addr = self.find_static_init_func()
+            if self.static_init_func_addr is None:
+                raise ValueError("Couldn't find static init function")
+            vprint(f'Static init function: {self.static_init_func_addr:08x}')
 
-        # Interpret it if needed, to populate self.memory_overrides
-        if self.source.needs_interpreter:
-            self.memory_overrides = self.run_interpreter()
-            vprint(f'Interpreter created {len(self.memory_overrides)} memory overrides')
+            # Interpret it if needed, to populate self.memory_overrides
+            if self.source.needs_interpreter:
+                self.memory_overrides = self.run_interpreter()
+                vprint(f'Interpreter created {len(self.memory_overrides)} memory overrides')
 
         # Find basic info about the main table
         self.table_addr = self.find_table_addr()

@@ -6,9 +6,8 @@ import pathlib
 import struct
 import typing
 
-import code_file_dol  # TODO: use code_file_all instead, for alf (also maybe redesign those classes now that I actually understand the formatss)
-
 import export_base
+import export_nsmbw
 import export_nsmbu
 
 import common
@@ -24,7 +23,7 @@ class SourceType(enum.Enum):
     DOL_FILE = 'DOL file'
     ALF_FILE = 'ALF file'
     DOLPHIN_RAM_DUMP_FOLDER = 'Dolphin RAM dump folder'
-    DOLPHIN_RAM_DUMP_FILE = 'Dolphin RAM dump file'
+    DOLPHIN_RAM_DUMP_FILE = 'Dolphin MEM1 RAM dump file'
 
     # 3DS
     CITRA_RAM_DUMP_FOLDER = 'Citra RAM dump folder'
@@ -84,7 +83,7 @@ def detect_source_type(path: pathlib.Path) -> SourceType:
         return True
 
     if path.is_dir():
-        if (path / 'mem2.raw').is_file():
+        if (path / 'mem1.raw').is_file():
             return SourceType.DOLPHIN_RAM_DUMP_FOLDER
         # TODO: Citra ram dump folder
         elif (path / '02000000.bin').is_file():
@@ -93,7 +92,7 @@ def detect_source_type(path: pathlib.Path) -> SourceType:
     elif path.is_file():
         size = path.stat().st_size
 
-        if size == 0x04000000:  # 64 MB
+        if size == 0x01800000:  # 24 MB
             return SourceType.DOLPHIN_RAM_DUMP_FILE
         # TODO: Citra ram dump file
         elif size == 0x4e000000:  # ~ 1.2 GB
@@ -119,7 +118,7 @@ def resolve_folder_source_to_file(path: pathlib.Path, source_type: SourceType) -
     adjust the path and source type appropriately
     """
     if source_type is SourceType.DOLPHIN_RAM_DUMP_FOLDER:
-        return (path / 'mem2.raw'), SourceType.DOLPHIN_RAM_DUMP_FILE
+        return (path / 'mem1.raw'), SourceType.DOLPHIN_RAM_DUMP_FILE
 
     elif source_type is SourceType.CITRA_RAM_DUMP_FOLDER:
         raise NotImplementedError
@@ -136,7 +135,15 @@ def make_source_and_analysis(source_type: SourceType, file) -> (export_base.Sour
     Create instances of the appropriate Source and Analysis subclasses
     for a file-like object representing the specified source_type
     """
-    if source_type is SourceType.RPX_FILE:
+    if source_type is SourceType.DOL_FILE:
+        source = export_nsmbw.DOLFileSource(file)
+        return source, export_nsmbw.NSMBWAnalysis(source)
+
+    elif source_type is SourceType.DOLPHIN_RAM_DUMP_FILE:
+        source = export_nsmbw.DolphinRAMDumpSource(file)
+        return source, export_nsmbw.NSMBWAnalysis(source)
+
+    elif source_type is SourceType.RPX_FILE:
         source = export_nsmbu.RPXFileSource(file)
         return source, export_nsmbu.NSMBUAnalysis(source)
 

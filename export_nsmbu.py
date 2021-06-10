@@ -286,6 +286,7 @@ class NSMBUAnalysis(export_base.Analysis):
     Analysis subclass for NSMBU
     """
     uses_priorities = True
+    uses_static_init_func = True
 
     def find_static_init_func(self) -> int:
         """
