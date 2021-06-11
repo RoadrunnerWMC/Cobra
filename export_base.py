@@ -81,6 +81,148 @@ class SimpleRAMDumpSource(Source):
         self.file.seek(addr - self.base_address)
 
 
+class AbstractLazilyDecompressedSection:
+    """
+    Abstract base class for a section for
+    FileSourceWithLazilyDecompressedSections
+    """
+    def __init__(self, file, addr: int, offset: int, decomp_size: int):
+        self.file = file
+        self.addr = addr
+        self.offset = offset
+        self.decomp_size = decomp_size
+
+
+    def has(self, addr: int) -> bool:
+        """
+        Check if this section contains the specified address
+        """
+        return self.addr <= addr < self.addr + self.decomp_size
+
+
+    def seek(self, addr: int):
+        """
+        Seek to a specific RAM address
+        """
+        raise NotImplementedError
+
+
+    def read(self, amount: int) -> bytes:
+        """
+        Like file.read()
+        """
+        raise NotImplementedError
+
+
+class LazilyDecompressedSection_Uncompressed(AbstractLazilyDecompressedSection):
+    """
+    Abstract base class for an uncompressed section for
+    FileSourceWithLazilyDecompressedSections
+    """
+    def seek(self, addr: int):
+        """
+        Seek to a specific RAM address
+        """
+        self.file.seek(self.offset + addr - self.addr)
+
+
+    def read(self, amount: int) -> bytes:
+        """
+        Like file.read()
+        """
+        return self.file.read(amount)
+
+
+class LazilyDecompressedSection_Compressed(AbstractLazilyDecompressedSection):
+    """
+    Abstract base class for a compressed section for
+    FileSourceWithLazilyDecompressedSections
+    """
+    def __init__(self, file, addr: int, offset: int, comp_size: int, decomp_size: int):
+        super().__init__(file, addr, offset, decomp_size)
+        self.comp_size = comp_size
+        self.decomp_data = None
+        self.cursor = 0
+
+
+    def decompress(self, data: bytes) -> bytes:
+        """
+        Override in subclasses to provide the appropriate decompression
+        algorithm
+        """
+        raise NotImplementedError
+
+
+    def ensure_decompressed(self):
+        """
+        If the data hasn't been decompressed yet, decompress it.
+        Otherwise do nothing.
+        """
+        if self.decomp_data is not None: return
+        self.file.seek(self.offset)
+        self.decomp_data = self.decompress(self.file.read(self.comp_size))
+
+
+    def seek(self, addr: int):
+        """
+        Seek to a specific RAM address
+        """
+        self.cursor = addr - self.addr
+
+
+    def read(self, amount: int) -> bytes:
+        """
+        Like file.read()
+        """
+        self.ensure_decompressed()
+        data = self.decomp_data[self.cursor : self.cursor + amount]
+        self.cursor += amount
+        return data
+
+
+class FileSourceWithLazilyDecompressedSections(Source):
+    """
+    Source subclass for a file with lazily decompressed sections (such
+    as RPX or NSO)
+    """
+    sections: list  # of AbstractLazilyDecompressedSection
+
+    def __init__(self, file):
+        super().__init__(file)
+
+        self.sections = []
+
+        # So .read() can know which section was most recently .seek()ed in
+        self.current_section = None
+
+
+    def get_section(self, addr: int) -> AbstractLazilyDecompressedSection:
+        """
+        Get the section containing the specified address (or None if none)
+        """
+        for section in self.sections:
+            if section.has(addr):
+                return section
+
+
+    def seek(self, addr: int):
+        """
+        Seek to a specific RAM address
+        """
+        self.current_section = self.get_section(addr)
+        if self.current_section is None:
+            raise ValueError(f'{addr:08x} is not in any section')
+
+        self.current_section.seek(addr)
+
+
+    def read(self, amount: int) -> bytes:
+        """
+        Like file.read()
+        """
+        return self.current_section.read(amount)
+
+
 class Analysis:
     """
     Base class for an analyzer that finds important addresses and constants.
@@ -259,12 +401,16 @@ class Analysis:
         patching, which can be saved to a json file and later reused
         as a stand-in for the source we just analyzed
         """
-        return {
+        info = {
             'game': self.game_variant.game.value,
             'game_variant': self.game_variant.id,
 
-            'static_init_func_addr': self.static_init_func_addr,
             'table_addr': self.table_addr,
             'table_length': self.table_length,
             'terminator_command': self.terminator_command,
         }
+
+        if self.uses_static_init_func:
+            info['static_init_func_addr'] = self.static_init_func_addr
+
+        return info

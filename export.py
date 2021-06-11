@@ -9,6 +9,7 @@ import typing
 import export_base
 import export_nsmbw
 import export_nsmbu
+import export_nsmbudx
 
 import common
 
@@ -35,7 +36,7 @@ class SourceType(enum.Enum):
     CEMU_RAM_DUMP_FILE = 'Cemu RAM dump file'
 
     # Switch
-    ...
+    NSO_FILE = 'NSO file'
 
     def game(self) -> common.Game:
         """
@@ -45,6 +46,8 @@ class SourceType(enum.Enum):
             return common.Game.NSMB2
         elif self in {self.RPX_FILE, self.CEMU_RAM_DUMP_FOLDER, self.CEMU_RAM_DUMP_FILE}:
             return common.Game.NSMBU
+        elif self is NSO_FILE:
+            return common.Game.NSMBUDX
         else:
             return common.Game.NSMBW
 
@@ -111,6 +114,9 @@ def detect_source_type(path: pathlib.Path) -> SourceType:
         if detect_dol_from_header(first_0x100):
             return SourceType.DOL_FILE
 
+        if first_0x100[:4] == b'NSO0':
+            return SourceType.NSO_FILE
+
 
 def resolve_folder_source_to_file(path: pathlib.Path, source_type: SourceType) -> (pathlib.Path, SourceType):
     """
@@ -150,6 +156,10 @@ def make_source_and_analysis(source_type: SourceType, file) -> (export_base.Sour
     elif source_type is SourceType.CEMU_RAM_DUMP_FILE:
         source = export_nsmbu.CemuRAMDumpSource(file)
         return source, export_nsmbu.NSMBUAnalysis(source)
+
+    elif source_type is SourceType.NSO_FILE:
+        source = export_nsmbudx.NSOFileSource(file)
+        return source, export_nsmbudx.NSMBUDXAnalysis(source)
 
     raise NotImplementedError(f'Not yet implemented: {source_type.value}')
 
@@ -301,6 +311,8 @@ def do_analyze(input_file: pathlib.Path) -> None:
     print(f'Analyzing "{input_file.name}"...')
 
     source_type = detect_source_type(input_file)
+    if source_type is None:
+        raise ValueError('Unable to determine source type')
     print(f'Source type: {source_type.value}')
 
     # If the user specified a folder (like a Dolphin or Cemu RAM dump
@@ -321,6 +333,8 @@ def do_export(input_file: pathlib.Path, scripts_file: pathlib.Path, version_info
     Handle the "export" command (with all default parameter values filled in as needed)
     """
     source_type = detect_source_type(input_file)
+    if source_type is None:
+        raise ValueError('Unable to determine source type')
 
     # If the user specified a folder (like a Dolphin or Cemu RAM dump
     # folder), get the actual file instead

@@ -1,6 +1,6 @@
 # World Map Scripts in NSMBU
 
-**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbu" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2021-06-07T15:53:25.051216.)
+**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbu" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2021-06-11T04:03:43.532532.)
 
 ## Introduction
 
@@ -159,12 +159,22 @@ ID | Name | Description
 **117** | ?? | -
 **118** | ?? | -
 
-### 1.3.0
+### 1.3.0 and NSLU
 
 ID | Name | Description
 -- | ---- | -----------
 **119** | ?? | -
 **120** | ?? | -
+
+### NSMBUDX
+
+#### Re-numbered
+
+* **115+** renumbered to **114+**
+
+#### Removed
+
+**114**
 
 ## Commands
 
@@ -527,7 +537,7 @@ ID | Name | Description | Argument
 -- | ---- | ----------- | --------
 **341** | ?? | Unused. | ??
 
-### 1.3.0
+### 1.3.0 and NSLU
 
 #### Re-numbered
 
@@ -539,3 +549,13 @@ ID | Name | Description | Argument
 -- | ---- | ----------- | --------
 **291** | ?? | - | ??
 **292** | ?? | - | ??
+
+### NSMBUDX
+
+#### Re-numbered
+
+* **312+** renumbered to **311+**
+
+#### Removed
+
+**311**

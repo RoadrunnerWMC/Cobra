@@ -54,4 +54,4 @@ class NSMBWAnalysis(export_base.Analysis):
         """
         # Only one variant defined for NSMBW
         variants = game_variants.load_game_json(common.Game.NSMBW)
-        return variants['v1']
+        return variants['all']

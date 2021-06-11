@@ -81,7 +81,7 @@ class NumberedListDiff:
             renumber.append(RenumberingRange.read_from_json(key, value))
 
         add = common.convert_str_keys_to_int_keys(json_info.get('add', {}))
-        delete = common.convert_str_keys_to_int_keys(json_info.get('delete', {}))
+        delete = set(json_info.get('delete', []))
 
         return cls(renumber, add, delete)
 
@@ -130,6 +130,7 @@ def load_game_json(game: common.Game) -> dict:
         variant = GameVariant.read_from_json(variant_dict)
         variant.id = id
         variant.game = game
+        if variant.name is None: variant.name = variant.id
         variants[id] = variant
 
     # Assign parents

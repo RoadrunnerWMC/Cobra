@@ -92,126 +92,22 @@ class TheWorldsWorstPowerPCInterpreter:
             print(f'WARNING: unexpected opcode {opcode}')
 
 
-class RPXSection:
+class RPXSectionUncompressed(export_base.LazilyDecompressedSection_Uncompressed):
     """
-    Abstract base class for a RPX section
+    Uncompressed RPX section
     """
-    def __init__(self, file, flags: int, addr: int, offset: int, size: int):
-        self.file = file
-        self.addr = addr
+    pass
 
 
-    def has(self, addr: int) -> bool:
-        """
-        Check if this section contains the specified address
-        """
-        raise NotImplementedError
-
-
-    def seek(self, addr: int):
-        """
-        Seek to a specific RAM address
-        """
-        raise NotImplementedError
-
-
-    def read(self, amount: int) -> bytes:
-        """
-        Like file.read()
-        """
-        raise NotImplementedError
-
-
-class RPXSectionUncompressed(RPXSection):
+class RPXSectionCompressed(export_base.LazilyDecompressedSection_Compressed):
     """
-    Uncompressed RPX section. This is just a thin wrapper around the
-    file-like object, since we can read from it directly
+    Compressed RPX section
     """
-    def __init__(self, file, flags: int, addr: int, offset: int, size: int):
-        super().__init__(file, flags, addr, offset, size)
-        self.addr = addr
-        self.offset = offset
-        self.size = size
+    def decompress(self, data: bytes) -> bytes:
+        return zlib.decompress(data)
 
 
-    def has(self, addr: int) -> bool:
-        """
-        Check if this section contains the specified address
-        """
-        return self.addr <= addr < self.addr + self.size
-
-
-    def seek(self, addr: int):
-        """
-        Seek to a specific RAM address
-        """
-        self.file.seek(self.offset + addr - self.addr)
-
-
-    def read(self, amount: int) -> bytes:
-        """
-        Like file.read()
-        """
-        return self.file.read(amount)
-
-
-class RPXSectionCompressed(RPXSection):
-    """
-    Compressed RPX section. This class is lazy, decompressing the
-    section data only if .read() is called.
-    """
-    def __init__(self, file, flags: int, addr: int, offset: int, size: int):
-        super().__init__(file, flags, addr, offset, size)
-        self.addr = addr
-
-        self._decompressed_yet = False
-        self.offset = offset
-        self.size = size
-
-        self.file.seek(offset)
-        self.decomp_size, = struct.unpack('>I', file.read(4))
-
-        self.cursor = 0
-
-
-    def has(self, addr: int) -> bool:
-        """
-        Check if this section contains the specified address
-        """
-        return self.addr <= addr < self.addr + self.decomp_size
-
-
-    def _ensure_decompressed(self):
-        """
-        If the data hasn't been decompressed yet, decompress it.
-        Otherwise do nothing.
-        """
-        if self._decompressed_yet: return
-
-        self.file.seek(self.offset + 4)
-        self.decomp_data = zlib.decompress(self.file.read(self.size - 4))
-
-        self._decompressed_yet = True
-
-
-    def seek(self, addr: int):
-        """
-        Seek to a specific RAM address
-        """
-        self.cursor = addr - self.addr
-
-
-    def read(self, amount: int) -> bytes:
-        """
-        Like file.read()
-        """
-        self._ensure_decompressed()
-        data = self.decomp_data[self.cursor : self.cursor + amount]
-        self.cursor += amount
-        return data
-
-
-class RPXFileSource(export_base.Source):
+class RPXFileSource(export_base.FileSourceWithLazilyDecompressedSections):
     """
     Source subclass for an RPX file
     """
@@ -234,43 +130,21 @@ class RPXFileSource(export_base.Source):
         shentsize, shnum = struct.unpack('>HH', file.read(4))
 
         # Read sections table
-        self.sections = []
         for i in range(shnum):
             shent_base = shoff + shentsize * i
             file.seek(shent_base + 8)
             flags, addr, offset, size = struct.unpack('>4I', file.read(16))
 
-            if flags & 0x08000000:
-                self.sections.append(RPXSectionCompressed(file, flags, addr, offset, size))
+            if flags & 0x08000000:  # compressed section
+                # Decompressed size is in the first 4 bytes of the section data
+                file.seek(offset)
+                decomp_size, = struct.unpack('>I', file.read(4))
+
+                # Adjust by 4 to account for the decompressed size value we just read
+                self.sections.append(RPXSectionCompressed(file, addr, offset + 4, size - 4, decomp_size))
+
             else:
-                self.sections.append(RPXSectionUncompressed(file, flags, addr, offset, size))
-
-        # So .read() can know which section was most recently .seek()ed in
-        self.current_section = None
-
-
-    def get_section(self, addr: int) -> RPXSection:
-        """
-        Get the section containing the specified address (or None if none)
-        """
-        for section in self.sections:
-            if section.has(addr):
-                return section
-
-
-    def seek(self, addr: int):
-        """
-        Seek to a specific RAM address
-        """
-        self.current_section = self.get_section(addr)
-        self.current_section.seek(addr)
-
-
-    def read(self, amount: int) -> bytes:
-        """
-        Like file.read()
-        """
-        return self.current_section.read(amount)
+                self.sections.append(RPXSectionUncompressed(file, addr, offset, size))
 
 
 class CemuRAMDumpSource(export_base.SimpleRAMDumpSource):
@@ -283,7 +157,7 @@ class CemuRAMDumpSource(export_base.SimpleRAMDumpSource):
 
 class NSMBUAnalysis(export_base.Analysis):
     """
-    Analysis subclass for NSMBU
+    Analysis subclass for NSMBU on Wii U
     """
     uses_priorities = True
     uses_static_init_func = True
@@ -427,6 +301,6 @@ class NSMBUAnalysis(export_base.Analysis):
         elif self.terminator_command == 342:
             return variants['1.1.0_1.2.0']
         elif self.terminator_command == 344:
-            return variants['1.3.0']
+            return variants['1.3.0_NSLU']
 
         raise ValueError(f'Unrecognized version of NSMBU, using terminator command {self.terminator_command}')
