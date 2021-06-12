@@ -109,14 +109,14 @@ class TheWorldsWorstPowerPCInterpreter:
             print(f'WARNING: unexpected opcode {opcode}')
 
 
-class RPXSectionUncompressed(export_base.LazilyDecompressedSection_Uncompressed):
+class RPXSectionUncompressed(export_base.SectionedFileSource_UncompressedSection):
     """
     Uncompressed RPX section
     """
     pass
 
 
-class RPXSectionCompressed(export_base.LazilyDecompressedSection_Compressed):
+class RPXSectionCompressed(export_base.SectionedFileSource_CompressedSection):
     """
     Compressed RPX section
     """
@@ -124,7 +124,7 @@ class RPXSectionCompressed(export_base.LazilyDecompressedSection_Compressed):
         return zlib.decompress(data)
 
 
-class RPXFileSource(export_base.FileSourceWithLazilyDecompressedSections):
+class RPXFileSource(export_base.SectionedFileSource):
     """
     Source subclass for an RPX file
     """

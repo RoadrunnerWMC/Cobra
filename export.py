@@ -160,6 +160,10 @@ def make_source_and_analysis(source_type: SourceType, file) -> (export_base.Sour
         source = export_nsmbw.DOLFileSource(file)
         return source, export_nsmbw.NSMBWAnalysis(source)
 
+    elif source_type is SourceType.ALF_FILE:
+        source = export_nsmbw.ALFFileSource(file)
+        return source, export_nsmbw.NSMBWAnalysis(source)
+
     elif source_type is SourceType.DOLPHIN_RAM_DUMP_FILE:
         source = export_nsmbw.DolphinRAMDumpSource(file)
         return source, export_nsmbw.NSMBWAnalysis(source)

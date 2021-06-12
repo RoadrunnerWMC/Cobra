@@ -97,10 +97,9 @@ class SimpleRAMDumpSource(Source):
         self.file.seek(addr - self.base_address)
 
 
-class AbstractLazilyDecompressedSection:
+class SectionedFileSource_AbstractSection:
     """
-    Abstract base class for a section for
-    FileSourceWithLazilyDecompressedSections
+    Abstract base class for a section for SectionedFileSource
     """
     def __init__(self, file, addr: int, offset: int, decomp_size: int):
         self.file = file
@@ -130,10 +129,10 @@ class AbstractLazilyDecompressedSection:
         raise NotImplementedError
 
 
-class LazilyDecompressedSection_Uncompressed(AbstractLazilyDecompressedSection):
+class SectionedFileSource_UncompressedSection(SectionedFileSource_AbstractSection):
     """
     Abstract base class for an uncompressed section for
-    FileSourceWithLazilyDecompressedSections
+    SectionedFileSource
     """
     def seek(self, addr: int):
         """
@@ -149,10 +148,9 @@ class LazilyDecompressedSection_Uncompressed(AbstractLazilyDecompressedSection):
         return self.file.read(amount)
 
 
-class LazilyDecompressedSection_Compressed(AbstractLazilyDecompressedSection):
+class SectionedFileSource_CompressedSection(SectionedFileSource_AbstractSection):
     """
-    Abstract base class for a compressed section for
-    FileSourceWithLazilyDecompressedSections
+    Abstract base class for a compressed section for SectionedFileSource
     """
     def __init__(self, file, addr: int, offset: int, comp_size: int, decomp_size: int):
         super().__init__(file, addr, offset, decomp_size)
@@ -196,12 +194,12 @@ class LazilyDecompressedSection_Compressed(AbstractLazilyDecompressedSection):
         return data
 
 
-class FileSourceWithLazilyDecompressedSections(Source):
+class SectionedFileSource(Source):
     """
     Source subclass for a file with lazily decompressed sections (such
     as RPX or NSO)
     """
-    sections: list  # of AbstractLazilyDecompressedSection
+    sections: list  # of SectionedFileSource_AbstractSection
 
     def __init__(self, file):
         super().__init__(file)
@@ -212,7 +210,7 @@ class FileSourceWithLazilyDecompressedSections(Source):
         self.current_section = None
 
 
-    def get_section(self, addr: int) -> AbstractLazilyDecompressedSection:
+    def get_section(self, addr: int) -> SectionedFileSource_AbstractSection:
         """
         Get the section containing the specified address (or None if none)
         """

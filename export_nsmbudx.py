@@ -28,14 +28,14 @@ import export_base
 import game_variants
 
 
-class NSOSectionUncompressed(export_base.LazilyDecompressedSection_Uncompressed):
+class NSOSectionUncompressed(export_base.SectionedFileSource_UncompressedSection):
     """
     Uncompressed NSO section
     """
     pass
 
 
-class NSOSectionCompressed(export_base.LazilyDecompressedSection_Compressed):
+class NSOSectionCompressed(export_base.SectionedFileSource_CompressedSection):
     """
     Compressed NSO section
     """
@@ -48,7 +48,7 @@ class NSOSectionCompressed(export_base.LazilyDecompressedSection_Compressed):
         return lz4.block.decompress(data, self.decomp_size)
 
 
-class NSOFileSource(export_base.FileSourceWithLazilyDecompressedSections):
+class NSOFileSource(export_base.SectionedFileSource):
     """
     Source subclass for a NSO file ("main")
     """
