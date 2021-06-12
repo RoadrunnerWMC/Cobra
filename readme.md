@@ -50,3 +50,70 @@ Markdown files, which are checked into the repository and kept up-to-date:
 * [World Map Scripts in NSMBW](docs/nsmbw.md)
 * [World Map Scripts in NSMB2](docs/nsmb2.md)
 * [World Map Scripts in NSMBU/NSLU/NSMBUDX](docs/nsmbu.md)
+
+## .wms format specification
+
+.wms (unimaginatively, "world map scripts") is the custom output file type
+produced by Cobra. It's similar to the simple script tables it's replacing, but
+with a header added. Thus this spec.
+
+The games themselves always use an *array* of scripts, i.e. script IDs are
+implicitly from 0 to num_scripts - 1. For modding purposes, though, it's
+convenient to be able to replace a *subset* of script IDs rather than replacing
+the entire table. Thus, .wms defines a *sparse* array of scripts, via an array
+of script IDs parallel to the custom scripts array. For example, if the script
+IDs array is [10, 12, 23, 35], then the four scripts in the .wms's scripts
+table are intended to replace the retail scripts at those indices.
+
+Script IDs are allowed to go beyond the number of scripts in the original
+game's table, so that you can define brand-new scripts if you want to.
+
+Pseudo-C description of the format:
+
+```c
+// (Same struct as native script commands)
+struct scriptCommand {
+    uint32_t id;
+    uint32_t argument;
+}
+
+// (Same struct as native scripts-table entries)
+struct scriptsTableEntry {
+#ifdef NSMBW
+    // (Assume priority = 0)
+#else
+    uint32_t priority;
+#endif
+    scriptCommand *start;  // offset relative to start of .wms file
+}
+
+struct wmsFile {
+    char magic[3];  // "WMS"
+    char version;  // Current version: '0' (as a character, not byte value
+                   // zero). If version is unrecognized, consider everything
+                   // beyond this point unparseable.
+    char game;  // - 'W' = NSMBW
+                // - '2' = NSMB2
+                // - 'U' = NSMBU or NSLU (on Wii U)
+                // - 'X' = NSMBUDX
+                // From this, you can infer endianness, and whether the
+                // scriptsTableEntry struct (above) includes priorities or not.
+                // If you load a .wms into the wrong game, the loader can
+                // panic instead of trying to read it.
+    char gameVariant[3];  // Game variant identifier, so that loading a .wms
+                          // file into the wrong version of a game can be
+                          // detected. The list of game variants is defined
+                          // elsewhere.
+                          // If you load a .wms into the wrong game variant,
+                          // the loader can panic instead of trying to read it.
+    uint32_t numScripts;
+    uint32_t scriptIDs[numScripts];  // Guaranteed to be in sorted order so
+                                     // that binary searching is valid
+    scriptsTableEntry scriptsTable[numScripts];
+    scriptCommand scriptsData[];  // all of the commands data goes here
+}
+```
+
+### Game variants in .wms version 0
+
+todo
