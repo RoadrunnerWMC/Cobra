@@ -1,7 +1,9 @@
 # Cobra
 
-A tool for exporting and importing world map scripts in NSMBW, NSMB2, NSMBU,
-NSLU, and NSMBU Deluxe.
+A tool for exporting and importing world map scripts in all versions\* of
+NSMBW, NSMB2, NSMBU, NSLU, and NSMBU Deluxe.
+
+(\*Except for demo builds that don't have world maps at all.)
 
 ## Status
 
