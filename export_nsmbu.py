@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Cobra.  If not, see <https://www.gnu.org/licenses/>.
 
+import contextlib
+import pathlib
 import struct
 import zlib
 
@@ -128,6 +130,8 @@ class RPXFileSource(export_base.SectionedFileSource):
     """
     Source subclass for an RPX file
     """
+    name = 'RPX file'
+    game = common.Game.NSMBU
     endian = '>'
     needs_interpreter = True
 
@@ -168,8 +172,44 @@ class CemuRAMDumpSource(export_base.SimpleRAMDumpSource):
     """
     SimpleRAMDumpSource subclass for a Cemu RAM dump
     """
+    name = 'Cemu RAM dump'
+    game = common.Game.NSMBU
     endian = '>'
     base_address = 0x02000000
+
+
+@contextlib.contextmanager
+def try_open_source(path: pathlib.Path):
+    """
+    Context manager.
+    If the given Path can be recognized as a Source for this game, yield
+    that as the `with` target. Otherwise the `with` target will be None.
+    """
+    if path.is_dir():
+        main_ram_fp = (path / '02000000.bin')
+        if main_ram_fp.is_file():
+            with main_ram_fp.open('rb') as f:
+                yield CemuRAMDumpSource(f)
+                return
+
+    elif path.is_file():
+        size = path.stat().st_size
+
+        with path.open('rb') as f:
+
+            # Cemu RAM dump
+            if size == 0x4e000000:  # ~ 1.2 GB
+                yield CemuRAMDumpSource(f)
+                return
+
+            # RPX
+            # I'm aware this heuristic is very presumptuous
+            f.seek(0)
+            if f.read(4) == b'\x7fELF':
+                yield RPXFileSource(f)
+                return
+
+    yield None
 
 
 class NSMBUAnalysis(export_base.Analysis):

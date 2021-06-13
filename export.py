@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Cobra.  If not, see <https://www.gnu.org/licenses/>.
 
+import contextlib
 import enum
 import json
 import pathlib
@@ -29,158 +30,42 @@ import export_nsmbudx
 import common
 
 
-class SourceType(enum.Enum):
+EXPORT_MODULES = [
+    export_nsmbw,
+    export_nsmbu,
+    export_nsmbudx,
+]
+ANALYSIS_FOR_SOURCE = {
+    common.Game.NSMBW: export_nsmbw.NSMBWAnalysis,
+    common.Game.NSMBU: export_nsmbu.NSMBUAnalysis,
+    common.Game.NSMBUDX: export_nsmbudx.NSMBUDXAnalysis,
+}
+
+
+@contextlib.contextmanager
+def open_source(path: pathlib.Path):
     """
-    Different things we're able to read scripts from
+    Context manager.
+    If the given Path can be recognized as a Source for this game, yield
+    that as the `with` target. Otherwise the `with` target will be None.
     """
-    # Strings here are used in error messages, so they should look nice.
+    for export_module in EXPORT_MODULES:
+        with export_module.try_open_source(path) as source:
+            if source is not None:
+                yield source
+                return
 
-    # Wii
-    DOL_FILE = 'DOL file'
-    ALF_FILE = 'ALF file'
-    DOLPHIN_RAM_DUMP_FOLDER = 'Dolphin RAM dump folder'
-    DOLPHIN_RAM_DUMP_FILE = 'Dolphin MEM1 RAM dump file'
-
-    # 3DS
-    CITRA_RAM_DUMP_FOLDER = 'Citra RAM dump folder'
-    CITRA_RAM_DUMP_FILE = 'Citra RAM dump file'
-
-    # Wii U
-    RPX_FILE = 'RPX file'
-    CEMU_RAM_DUMP_FOLDER = 'Cemu RAM dump folder'
-    CEMU_RAM_DUMP_FILE = 'Cemu RAM dump file'
-
-    # Switch
-    NSO_FILE = 'NSO file'
-
-    def game(self) -> common.Game:
-        """
-        Get the Game which corresponds to this source type
-        """
-        if self in {self.CITRA_RAM_DUMP_FOLDER, self.CITRA_RAM_DUMP_FILE}:
-            return common.Game.NSMB2
-        elif self in {self.RPX_FILE, self.CEMU_RAM_DUMP_FOLDER, self.CEMU_RAM_DUMP_FILE}:
-            return common.Game.NSMBU
-        elif self is NSO_FILE:
-            return common.Game.NSMBUDX
-        else:
-            return common.Game.NSMBW
+    raise ValueError(f'Unable to determine source type for {path.name}')
 
 
-def detect_source_type(path: pathlib.Path) -> SourceType:
+def get_analysis_for_source(source: export_base.Source) -> export_base.Analysis:
     """
-    Auto-detect the type of input data provided by the user
+    Return the appropriate Analysis subclass for the given Source.
     """
-    def detect_dol_from_header(header: bytes) -> bool:
-        """
-        Given the first 0x100 bytes of a file, check if it looks like
-        a NSMBW DOL file
-        """
-        if len(header) < 0x100:
-            return False
-
-        PLACES_TO_CHECK = {
-            # 0 = "expected to be 00000000", 1 = "expected to be nonzero"
-            0x00: 1,  # executable section offsets array (start)
-            0x04: 1,  # ibid
-            0x10: 0,  # executable section offsets array (end)
-            0x14: 0,  # ibid
-            0x18: 0,  # ibid
-            0x1C: 1,  # data section offsets array (start)
-            0x20: 1,  # ibid
-            0x24: 1,  # ibid
-            0x44: 0,  # data section offsets array (end)
-            0x48: 1,  # executable section addresses array (start)
-        }
-
-        for offs, should_be_nonzero in PLACES_TO_CHECK.items():
-            value_here, = struct.unpack_from('>I', header, offs)
-            if bool(value_here) != bool(should_be_nonzero):
-                return False
-
-        return True
-
-    if path.is_dir():
-        if (path / 'mem1.raw').is_file():
-            return SourceType.DOLPHIN_RAM_DUMP_FOLDER
-        # TODO: Citra ram dump folder
-        elif (path / '02000000.bin').is_file():
-            return SourceType.CEMU_RAM_DUMP_FOLDER
-
-    elif path.is_file():
-        size = path.stat().st_size
-
-        if size == 0x01800000:  # 24 MB
-            return SourceType.DOLPHIN_RAM_DUMP_FILE
-        # TODO: Citra ram dump file
-        elif size == 0x4e000000:  # ~ 1.2 GB
-            return SourceType.CEMU_RAM_DUMP_FILE
-
-        # Check header
-        with path.open('rb') as f:
-            first_0x100 = f.read(0x100)
-
-        if first_0x100[:4] == b'\x7fELF':
-            return SourceType.RPX_FILE
-
-        if first_0x100[:4] == b'RBOF':
-            return SourceType.ALF_FILE
-
-        if detect_dol_from_header(first_0x100):
-            return SourceType.DOL_FILE
-
-        if first_0x100[:4] == b'NSO0':
-            return SourceType.NSO_FILE
-
-
-def resolve_folder_source_to_file(path: pathlib.Path, source_type: SourceType) -> (pathlib.Path, SourceType):
-    """
-    If the source is a folder containing the file we actually want,
-    adjust the path and source type appropriately
-    """
-    if source_type is SourceType.DOLPHIN_RAM_DUMP_FOLDER:
-        return (path / 'mem1.raw'), SourceType.DOLPHIN_RAM_DUMP_FILE
-
-    elif source_type is SourceType.CITRA_RAM_DUMP_FOLDER:
-        raise NotImplementedError
-
-    elif source_type is SourceType.CEMU_RAM_DUMP_FOLDER:
-        return (path / '02000000.bin'), SourceType.CEMU_RAM_DUMP_FILE
-
+    if source.game in ANALYSIS_FOR_SOURCE:
+        return ANALYSIS_FOR_SOURCE[source.game](source)
     else:
-        return path, source_type
-
-
-def make_source_and_analysis(source_type: SourceType, file) -> (export_base.Source, export_base.Analysis):
-    """
-    Create instances of the appropriate Source and Analysis subclasses
-    for a file-like object representing the specified source_type
-    """
-    if source_type is SourceType.DOL_FILE:
-        source = export_nsmbw.DOLFileSource(file)
-        return source, export_nsmbw.NSMBWAnalysis(source)
-
-    elif source_type is SourceType.ALF_FILE:
-        source = export_nsmbw.ALFFileSource(file)
-        return source, export_nsmbw.NSMBWAnalysis(source)
-
-    elif source_type is SourceType.DOLPHIN_RAM_DUMP_FILE:
-        source = export_nsmbw.DolphinRAMDumpSource(file)
-        return source, export_nsmbw.NSMBWAnalysis(source)
-
-    elif source_type is SourceType.RPX_FILE:
-        source = export_nsmbu.RPXFileSource(file)
-        return source, export_nsmbu.NSMBUAnalysis(source)
-
-    elif source_type is SourceType.CEMU_RAM_DUMP_FILE:
-        source = export_nsmbu.CemuRAMDumpSource(file)
-        return source, export_nsmbu.NSMBUAnalysis(source)
-
-    elif source_type is SourceType.NSO_FILE:
-        source = export_nsmbudx.NSOFileSource(file)
-        return source, export_nsmbudx.NSMBUDXAnalysis(source)
-
-    raise NotImplementedError(f'Not yet implemented: {source_type.value}')
+        raise NotImplementedError(f'Unknown analysis class for {source}')
 
 
 def read_scripts(source: export_base.Source, analysis: export_base.Analysis) -> list:
@@ -329,21 +214,10 @@ def do_analyze(input_file: pathlib.Path) -> None:
     """
     print(f'Analyzing "{input_file.name}"...')
 
-    source_type = detect_source_type(input_file)
-    if source_type is None:
-        raise ValueError('Unable to determine source type')
-    print(f'Source type: {source_type.value}')
+    with open_source(input_file) as source:
+        print(f'Source type: {source.name}')
 
-    # If the user specified a folder (like a Dolphin or Cemu RAM dump
-    # folder), get the actual file instead
-    input_file, source_type = \
-        resolve_folder_source_to_file(input_file, source_type)
-
-    with input_file.open('rb') as f:
-        # Create the appropriate source and analysis classes
-        source, analysis = make_source_and_analysis(source_type, f)
-
-        # Analyze
+        analysis = get_analysis_for_source(source)
         analysis.analyze(verbose=True)
 
 
@@ -351,20 +225,10 @@ def do_export(input_file: pathlib.Path, scripts_file: pathlib.Path, version_info
     """
     Handle the "export" command (with all default parameter values filled in as needed)
     """
-    source_type = detect_source_type(input_file)
-    if source_type is None:
-        raise ValueError('Unable to determine source type')
-
-    # If the user specified a folder (like a Dolphin or Cemu RAM dump
-    # folder), get the actual file instead
-    input_file, source_type = \
-        resolve_folder_source_to_file(input_file, source_type)
-
-    with input_file.open('rb') as f:
-        # Create the appropriate source and analysis classes
-        source, analysis = make_source_and_analysis(source_type, f)
+    with open_source(input_file) as source:
 
         # Analyze
+        analysis = get_analysis_for_source(source)
         analysis.analyze()
 
         # Save analysis results
@@ -375,10 +239,10 @@ def do_export(input_file: pathlib.Path, scripts_file: pathlib.Path, version_info
         # Read low-level (int-based) scripts
         scripts_low = read_scripts(source, analysis)
 
-    # Convert to high-level (str-based) scripts
-    scripts_high = convert_to_high_level(scripts_low, analysis)
+        # Convert to high-level (str-based) scripts
+        scripts_high = convert_to_high_level(scripts_low, analysis)
 
-    # Save output
-    txt = convert_to_text(scripts_high)
-    with scripts_file.open('w', encoding='utf-8') as f:
-        f.write(txt)
+        # Save output
+        txt = convert_to_text(scripts_high)
+        with scripts_file.open('w', encoding='utf-8') as f:
+            f.write(txt)

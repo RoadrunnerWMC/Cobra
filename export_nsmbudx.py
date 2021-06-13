@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Cobra.  If not, see <https://www.gnu.org/licenses/>.
 
+import contextlib
+import pathlib
 import struct
 
 try:
@@ -52,6 +54,8 @@ class NSOFileSource(export_base.SectionedFileSource):
     """
     Source subclass for a NSO file ("main")
     """
+    name = 'NSO file'
+    game = common.Game.NSMBUDX
     endian = '<'
 
     def __init__(self, file):
@@ -86,6 +90,24 @@ class NSOFileSource(export_base.SectionedFileSource):
                 self.sections.append(NSOSectionCompressed(file, addr, offset, comp_size, decomp_size))
             else:
                 self.sections.append(NSOSectionUncompressed(file, addr, offset, comp_size))
+
+
+@contextlib.contextmanager
+def try_open_source(path: pathlib.Path):
+    """
+    Context manager.
+    If the given Path can be recognized as a Source for this game, yield
+    that as the `with` target. Otherwise the `with` target will be None.
+    """
+    if path.is_file():
+        with path.open('rb') as f:
+            # NSO
+            f.seek(0)
+            if f.read(4) == b'NSO0':
+                yield NSOFileSource(f)
+                return
+
+    yield None
 
 
 class NSMBUDXAnalysis(export_base.Analysis):

@@ -27,6 +27,8 @@ class Source:
     Source base class. Essentially a wrapper around a file object, which
     is capable of "seeking" to particular memory addresses.
     """
+    name: str
+    game: common.Game
     endian: str
     needs_interpreter: bool = False
 
@@ -196,8 +198,8 @@ class SectionedFileSource_CompressedSection(SectionedFileSource_AbstractSection)
 
 class SectionedFileSource(Source):
     """
-    Source subclass for a file with lazily decompressed sections (such
-    as RPX or NSO)
+    Source subclass for a file with sections at various addresses, some
+    of which might be compressed (e.g. DOL, ALF, RPX, NSO)
     """
     sections: list  # of SectionedFileSource_AbstractSection
 
@@ -297,6 +299,11 @@ class Analysis:
         if self.table_addr is None:
             raise ValueError("Couldn't find scripts table")
         vprint(f'Scripts table: {self.table_addr:08x}')
+
+        if verbose:
+            self.source.seek(self.table_addr + (4 if self.uses_priorities else 0))
+            first_script_addr = self.source.read_u32()
+            vprint(f'First script: {first_script_addr:08x}')
 
         self.table_length = self.find_table_length()
         if self.table_length is None:
