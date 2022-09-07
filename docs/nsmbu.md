@@ -1,6 +1,6 @@
 # World Map Scripts in NSMBU
 
-**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbu" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2021-06-12T00:04:35.968945.)
+**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbu" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2022-09-07T02:57:54.867637.)
 
 ## Introduction
 
@@ -12,9 +12,9 @@ Thanks to [Kinnay](https://github.com/kinnay), [Luminyx](https://github.com/Lumi
 
 Command IDs (but not arguments, strangely) are empty in the static RPX data, and are filled in at runtime by the static init function at 0x021DAB60. Commands are read by the class with constructor at 0x021DC720 (unofficially, "CsEventMgr"). The `イベントアシスタント` ("Event Assistant") actor is also involved in some way, and might be responsible for executing the events.
 
-The scripts table is at 0x10044A60, and is an array of 119 of the following: `{uint32_t priority; void *script_ptr}`. Scripts are executed using a priority queue, so if multiple scripts are triggered at the same time, they'll execute in order of descending priority.
+The scripts table is at 0x10044A60, and is an array of 119 of the following: `{uint32_t priority; ScriptCommand *script_ptr}` with `ScriptCommand` (unofficial name) having the same format as NSMBW, being `{uint32_t command_id; uint32_t argument}`. Scripts are executed using a priority queue, so if multiple scripts are triggered at the same time, they'll execute in order of descending priority.
 
-Script commands are the same format as NSMBW: `{uint32_t command_id; uint32_t argument}`. The terminator command to end a script is 341.
+The terminator command to end a script is 341.
 
 The script names in the "Scripts" tables below are unofficial.
 

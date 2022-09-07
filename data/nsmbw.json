@@ -3,172 +3,172 @@
         "scripts": {
             "add": {
                 "0":  {
-                    "name": "default_clr",
+                    "name": "smc_demo_default_clr",
                     "description": "Script that plays when a normal course is successfully completed."
                 },
                 "1":  {
-                    "name": "default_fail",
+                    "name": "smc_demo_default_fail",
                     "description": "Script that plays when a normal course is failed."
                 },
                 "2":  {
-                    "name": "enemy_clr"
+                    "name": "smc_demo_enemy_clr"
                 },
                 "3":  {
-                    "name": "enemy_fail"
+                    "name": "smc_demo_enemy_fail"
                 },
                 "4":  {
-                    "name": "toride_in",
+                    "name": "smc_demo_toride_in",
                     "description": "Script that plays when a tower is entered."
                 },
                 "5":  {
-                    "name": "toride_clr",
+                    "name": "smc_demo_toride_clr",
                     "description": "Script that plays when a tower is successfully completed."
                 },
                 "6":  {
-                    "name": "toride_fail"
+                    "name": "smc_demo_toride_fail"
                 },
                 "7":  {
-                    "name": "toride_fail2"
+                    "name": "smc_demo_toride_fail2"
                 },
                 "8":  {
-                    "name": "castle_in",
+                    "name": "smc_demo_castle_in",
                     "description": "Script that plays when a castle is entered."
                 },
                 "9":  {
-                    "name": "castle_clr",
+                    "name": "smc_demo_castle_clr",
                     "description": "Script that plays when a castle is successfully completed."
                 },
                 "10": {
-                    "name": "castle_fail"
+                    "name": "smc_demo_castle_fail"
                 },
                 "11": {
-                    "name": "castle_fail2"
+                    "name": "smc_demo_castle_fail2"
                 },
                 "12": {
-                    "name": "ghost_in",
+                    "name": "smc_demo_ghost_in",
                     "description": "Script that plays when a ghost house is entered."
                 },
                 "13": {
-                    "name": "ghost_clr",
+                    "name": "smc_demo_ghost_clr",
                     "description": "Script that plays when a ghost house is successfully completed."
                 },
                 "14": {
-                    "name": "ghost_fail"
+                    "name": "smc_demo_ghost_fail"
                 },
                 "15": {
-                    "name": "ghost_fail2"
+                    "name": "smc_demo_ghost_fail2"
                 },
                 "16": {
-                    "name": "cannon"
+                    "name": "smc_demo_cannon"
                 },
                 "17": {
-                    "name": "show_wm_note",
-                    "description": "Unofficial name, real name is unknown. Demangled symbol hash is 0x56f66ffc.\n\nCauses a WM_NOTE actor (if previously spawned) to appear above Mario's head, and then move to a random map node, with the camera following it."
+                    "name": "smc_demo_trship_appear",
+                    "description": "Causes a WM_NOTE actor (if previously spawned) to appear above Mario's head, and then move to a random map node, with the camera following it."
                 },
                 "18": {
-                    "name": "dokan"
+                    "name": "smc_demo_dokan"
                 },
                 "19": {
-                    "name": "dokan_warp"
+                    "name": "smc_demo_dokan_warp"
                 },
                 "20": {
-                    "name": "dokan_start"
+                    "name": "smc_demo_dokan_start"
                 },
                 "21": {
-                    "name": "W_Walking_in"
+                    "name": "smc_demo_W_Walking_in"
                 },
                 "22": {
-                    "name": "W_Walking_in_Normal"
+                    "name": "smc_demo_W_Walking_in_Normal"
                 },
                 "23": {
-                    "name": "W_Flying_in"
+                    "name": "smc_demo_W_Flying_in"
                 },
                 "24": {
-                    "name": "W_Cannon_in"
+                    "name": "smc_demo_W_Cannon_in"
                 },
                 "25": {
-                    "name": "W_Cannon_in_Normal"
+                    "name": "smc_demo_W_Cannon_in_Normal"
                 },
                 "26": {
-                    "description": "Unknown name. Demangled symbol hash is 0x649307aa."
+                    "name": "smc_demo_W1_toride_clr"
                 },
                 "27": {
-                    "description": "Unknown name. Demangled symbol hash is 0x2a5ec5a7."
+                    "name": "smc_demo_W1_castle_clr"
                 },
                 "28": {
-                    "name": "wSign_koopaCastle_in"
+                    "name": "smc_demo_W3_castle_clr"
                 },
                 "29": {
-                    "description": "Unknown name. Demangled symbol hash is 0xcae3b49f. Might be \"fade_test\"?"
+                    "name": "smc_demo_fade_test"
                 },
                 "30": {
-                    "name": "view_world"
+                    "name": "smc_demo_view_world"
                 },
                 "31": {
-                    "name": "course_in"
+                    "name": "smc_demo_course_in"
                 },
                 "32": {
-                    "name": "kinoko_out"
+                    "name": "smc_demo_kinoko_out"
                 },
                 "33": {
-                    "name": "airship_course_in"
+                    "name": "smc_demo_airship_course_in"
                 },
                 "34": {
-                    "name": "airship_course_out"
+                    "name": "smc_demo_airship_course_out"
                 },
                 "35": {
-                    "name": "start_kinoko_in"
+                    "name": "smc_demo_start_kinoko_in"
                 },
                 "36": {
-                    "description": "Unknown name. Demangled symbol hash is 0x281e8a18."
+                    "name": "smc_demo_airship_gonext"
                 },
                 "37": {
-                    "description": "Unknown name. Demangled symbol hash is 0xcf0daa08."
+                    "name": "smc_demo_W36_Clear_Normal"
                 },
                 "38": {
-                    "name": "null"
+                    "name": "smc_demo_null"
                 },
                 "39": {
-                    "name": "antlion"
+                    "name": "smc_demo_antlion"
                 },
                 "40": {
-                    "name": "killer"
+                    "name": "smc_demo_killer"
                 },
                 "41": {
-                    "name": "start_battle"
+                    "name": "smc_demo_start_battle"
                 },
                 "42": {
-                    "name": "Switch"
+                    "name": "smc_demo_Switch"
                 },
                 "43": {
-                    "name": "KoopaCastleAppear"
+                    "name": "smc_demo_KoopaCastleAppear"
                 },
                 "44": {
-                    "name": "KinopioStart"
+                    "name": "smc_demo_KinopioStart"
                 },
                 "45": {
-                    "description": "Unknown name. Demangled symbol hash is 0xcfc42869."
+                    "name": "smc_demo_WorldIn_NoShip"
                 },
                 "46": {
-                    "description": "Unknown name. Demangled symbol hash is 0xaefdd774."
+                    "name": "smc_demo_WorldIn_Jump_NoShip"
                 },
                 "47": {
-                    "name": "Pause_Menu"
+                    "name": "smc_demo_Pause_Menu"
                 },
                 "48": {
-                    "name": "airship_clear"
+                    "name": "smc_demo_airship_clear"
                 },
                 "49": {
-                    "name": "Stock_Menu"
+                    "name": "smc_demo_Stock_Menu"
                 },
                 "50": {
-                    "name": "WorldSelect_Menu"
+                    "name": "smc_demo_WorldSelect_Menu"
                 },
                 "51": {
-                    "name": "antlion_star"
+                    "name": "smc_demo_antlion_star"
                 },
                 "52": {
-                    "name": "GameStart"
+                    "name": "smc_demo_GameStart"
                 }
             }
         },
