@@ -74,19 +74,19 @@ Pseudo-C description of the format:
 
 ```c
 // (Same struct as native script commands)
-struct scriptCommand {
+struct ScriptCommand {
     uint32_t id;
     uint32_t argument;
 }
 
 // (Same struct as native scripts-table entries)
-struct scriptsTableEntry {
+struct ScriptsTableEntry {
 #ifdef NSMBW
     // (Assume priority = 0)
 #else
     uint32_t priority;
 #endif
-    scriptCommand *start;  // offset relative to start of .wms file
+    ScriptCommand *start;  // offset relative to start of .wms file
 }
 
 struct wmsFile {
@@ -111,8 +111,8 @@ struct wmsFile {
     uint32_t numScripts;
     uint32_t scriptIDs[numScripts];  // Guaranteed to be in sorted order so
                                      // that binary searching is valid
-    scriptsTableEntry scriptsTable[numScripts];
-    scriptCommand scriptsData[];  // all of the commands data goes here
+    ScriptsTableEntry scriptsTable[numScripts];
+    ScriptCommand scriptsData[];  // all of the commands data goes here
 }
 ```
 
