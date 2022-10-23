@@ -118,4 +118,14 @@ struct wmsFile {
 
 ### Game variants in .wms version 0
 
-todo
+NSMBU:
+
+- `100`: NSMBU version 1.0.0
+- `110`: NSMBU versions 1.1.0 and 1.2.0
+- `130`: NSMBU version 1.3.0 (including the early EU version "64"), NSLU standalone, the NSMBU+NSLU bundle, and the JP eShop demo
+
+NSMBUDX:
+
+- `all`: all versions (international 1.0.0, and CN versions 1.0.0 and 1.0.1)
+
+Other games: (todo)
