@@ -49,6 +49,9 @@ def open_source(path: pathlib.Path):
     If the given Path can be recognized as a Source for this game, yield
     that as the `with` target. Otherwise the `with` target will be None.
     """
+    if not (path.is_file() or path.is_dir()):
+        raise ValueError(f'File or folder not found: {path}')
+
     for export_module in EXPORT_MODULES:
         with export_module.try_open_source(path) as source:
             if source is not None:
