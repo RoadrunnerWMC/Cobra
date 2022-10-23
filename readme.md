@@ -89,7 +89,7 @@ struct ScriptsTableEntry {
     ScriptCommand *start;  // offset relative to start of .wms file
 }
 
-struct wmsFile {
+struct WMSFile {
     char magic[3];  // "WMS"
     char version;  // Current version: '0' (as a character, not byte value
                    // zero). If version is unrecognized, consider everything
