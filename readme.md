@@ -108,6 +108,7 @@ struct WMSFile {
                           // elsewhere.
                           // If you load a .wms into the wrong game variant,
                           // the loader can panic instead of trying to read it.
+    uint32_t fileSize;  // total file size, including all header stuff
     uint32_t numScripts;
     uint32_t scriptIDs[numScripts];  // Guaranteed to be in sorted order so
                                      // that binary searching is valid
