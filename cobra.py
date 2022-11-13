@@ -76,19 +76,19 @@ def main(argv:list=None) -> None:
         scripts_file = pArgs.scripts_file
         version_info_file = pArgs.version_info_file
 
-        wms_file = pArgs.wms_file
-        if wms_file is None: wms_file = scripts_file.with_suffix('.wms')
+        wmsc_file = pArgs.wmsc_file
+        if wmsc_file is None: wmsc_file = scripts_file.with_suffix('.wmsc')
 
-        encode.do_encode(scripts_file, version_info_file, wms_file)
+        encode.do_encode(scripts_file, version_info_file, wmsc_file)
 
     parser_encode = subparsers.add_parser('encode', aliases=['en'],
-        help='convert a scripts file to a .wms binary file')
+        help='convert a scripts file to a .wmsc binary file')
     parser_encode.add_argument('scripts_file', type=pathlib.Path,
         help='input file containing one or more scripts')
     parser_encode.add_argument('version_info_file', type=pathlib.Path,
         help="a version-info file (.json) characterizing the particular version of the game you're going to be using this with")
-    parser_encode.add_argument('wms_file', nargs='?', type=pathlib.Path,
-        help='output .wms file to save to')
+    parser_encode.add_argument('wmsc_file', nargs='?', type=pathlib.Path,
+        help='output .wmsc file to save to')
     parser_encode.set_defaults(func=handle_encode)
 
     def handle_docs(pArgs):

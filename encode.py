@@ -213,9 +213,9 @@ def convert_to_low_level(high_level_scripts: dict, variant: game_variants.GameVa
     return low_level_scripts
 
 
-def encode_wms(scripts: dict, *, endian: str, use_priorities: bool) -> bytes:
+def encode_wmsc(scripts: dict, *, endian: str, use_priorities: bool) -> bytes:
     """
-    Convert a dict of common.LowLevelScript to .wms file data
+    Convert a dict of common.LowLevelScript to .wmsc file data
     """
     data = bytearray()
     table_entry_len = (8 if use_priorities else 4)
@@ -252,7 +252,7 @@ def encode_wms(scripts: dict, *, endian: str, use_priorities: bool) -> bytes:
     return bytes(data)
 
 
-def do_encode(scripts_file: pathlib.Path, version_info_file: pathlib.Path, wms_file: pathlib.Path) -> None:
+def do_encode(scripts_file: pathlib.Path, version_info_file: pathlib.Path, wmsc_file: pathlib.Path) -> None:
     """
     Handle the "encode" command (with all default parameter values filled in as needed)
     """
@@ -271,10 +271,10 @@ def do_encode(scripts_file: pathlib.Path, version_info_file: pathlib.Path, wms_f
     # Convert high- to low-level scripts
     scripts_low = convert_to_low_level(scripts_high, variant)
 
-    # Encode and save .wms data
-    wms_data = encode_wms(scripts_low,
+    # Encode and save .wmsc data
+    wmsc_data = encode_wmsc(scripts_low,
         endian=variant.game.endian(),
         use_priorities=variant.game.uses_script_priorities())
 
-    with wms_file.open('wb') as f:
-        f.write(wms_data)
+    with wmsc_file.open('wb') as f:
+        f.write(wmsc_data)

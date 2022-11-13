@@ -14,7 +14,7 @@ though.
 
 Also, keep in mind that this is very unfinished -- for example, as I write
 this, NSMBW only partially works, I haven't started on NSMB2 at all yet, and
-there's no way to load your .wms files into any of the three games. ...So don't
+there's no way to load your .wmsc files into any of the three games. ...So don't
 expect very much to work just yet.
 
 ## World map scripts?
@@ -29,7 +29,7 @@ Editing world map scripts with Cobra is essentially a four-step process:
     * A text file containing scripts
     * A JSON file containing important address values required for patching
 * Edit the text-file scripts to your heart's content
-* Use `cobra encode` to convert the text file to a binary file (.wms, a simple custom format)
+* Use `cobra encode` to convert the text file to a binary file (.wmsc, a simple custom format)
 * Compile a patch for the game's code using the auto-detected addresses from step 1
 
 ## Setup
@@ -53,18 +53,18 @@ Markdown files, which are checked into the repository and kept up-to-date:
 * [World Map Scripts in NSMB2](docs/nsmb2.md)
 * [World Map Scripts in NSMBU/NSLU/NSMBUDX](docs/nsmbu.md)
 
-## .wms format specification
+## .wmsc format specification
 
-.wms (unimaginatively, "world map scripts") is the custom output file type
+.wmsc (unimaginatively, "world map scripts") is the custom output file type
 produced by Cobra. It's similar to the simple script tables it's replacing, but
 with a header added. Thus this spec.
 
 The games themselves always use an *array* of scripts, i.e. script IDs are
 implicitly from 0 to num_scripts - 1. For modding purposes, though, it's
 convenient to be able to replace a *subset* of script IDs rather than replacing
-the entire table. Thus, .wms defines a *sparse* array of scripts, via an array
+the entire table. Thus, .wmsc defines a *sparse* array of scripts, via an array
 of script IDs parallel to the custom scripts array. For example, if the script
-IDs array is [10, 12, 23, 35], then the four scripts in the .wms's scripts
+IDs array is [10, 12, 23, 35], then the four scripts in the .wmsc's scripts
 table are intended to replace the retail scripts at those indices.
 
 Script IDs are allowed to go beyond the number of scripts in the original
@@ -86,10 +86,10 @@ struct ScriptsTableEntry {
 #else
     uint32_t priority;
 #endif
-    ScriptCommand *start;  // offset relative to start of .wms file
+    ScriptCommand *start;  // offset relative to start of .wmsc file
 }
 
-struct WMSFile {
+struct WMSCFile {
     char magic[3];  // "WMS"
     char version;  // Current version: '0' (as a character, not byte value
                    // zero). If version is unrecognized, consider everything
@@ -100,13 +100,13 @@ struct WMSFile {
                 // - 'X' = NSMBUDX
                 // From this, you can infer endianness, and whether the
                 // scriptsTableEntry struct (above) includes priorities or not.
-                // If you load a .wms into the wrong game, the loader can
+                // If you load a .wmsc into the wrong game, the loader can
                 // panic instead of trying to read it.
-    char gameVariant[3];  // Game variant identifier, so that loading a .wms
+    char gameVariant[3];  // Game variant identifier, so that loading a .wmsc
                           // file into the wrong version of a game can be
                           // detected. The list of game variants is defined
                           // elsewhere.
-                          // If you load a .wms into the wrong game variant,
+                          // If you load a .wmsc into the wrong game variant,
                           // the loader can panic instead of trying to read it.
     uint32_t fileSize;  // total file size, including all header stuff
     uint32_t numScripts;
@@ -117,7 +117,7 @@ struct WMSFile {
 }
 ```
 
-### Game variants in .wms version 0
+### Game variants in .wmsc version 0
 
 NSMBU:
 
