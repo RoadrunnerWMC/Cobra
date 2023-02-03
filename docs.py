@@ -190,29 +190,19 @@ def do_docs() -> None:
 
         variants = game_variants.load_game_json(game)
 
+        input_file = pathlib.Path(f'data/{game.value}_template.md')
         output_file = pathlib.Path(f'docs/{game.value}.md')
 
-        file_lines = []
+        text = input_file.read_text(encoding='utf-8')
 
-        file_lines.append(f'# World Map Scripts in {game.value.upper()}')
-        file_lines.append(f'')
-        file_lines.append(f'**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "{game.value}" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated {datetime.datetime.now().isoformat()}.)')
-        file_lines.append(f'')
+        text = text.replace(
+            '{{DISCLAIMER}}',
+            f'**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "{game.value}" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated {datetime.datetime.now().isoformat()}.)')
+        text = text.replace(
+            '{{SCRIPTS}}',
+            '\n'.join(generate_md_sections_for_variants(game, variants, 'scripts', generate_md_scripts_table)))
+        text = text.replace(
+            '{{COMMANDS}}',
+            '\n'.join(generate_md_sections_for_variants(game, variants, 'commands', generate_md_commands_table)))
 
-        file_lines.append('## Introduction')
-        file_lines.append('')
-        file_lines.extend(
-            pathlib.Path(f'data/{game.value}_intro.md')
-                .read_text(encoding='utf-8')
-                .splitlines())
-        file_lines.append('')
-
-        file_lines.append('## Scripts')
-        file_lines.append('')
-        file_lines.extend(generate_md_sections_for_variants(game, variants, 'scripts', generate_md_scripts_table))
-
-        file_lines.append('## Commands')
-        file_lines.append('')
-        file_lines.extend(generate_md_sections_for_variants(game, variants, 'commands', generate_md_commands_table))
-
-        output_file.write_text('\n'.join(file_lines), encoding='utf-8')
+        output_file.write_text(text, encoding='utf-8')
