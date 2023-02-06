@@ -1,6 +1,6 @@
 # World Map Scripts in NSMBW
 
-**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-06T06:36:05.808359.)
+**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-06T06:38:12.566613.)
 
 The information below is specifically for the EU v1 release; specific numbers may vary in other releases. All names are official (derived from the Chinese Nvidia Shield TV release of NSMBW) except where noted.
 
@@ -90,7 +90,7 @@ ID | Name | Description
 **20** | `smc_demo_dokan_start` | Unused. Intended to be used when exiting a pipe from another world or sub-world.
 **21** | `smc_demo_W_Walking_in` | Plays when entering a world for the first time (with an airship cutscene) by walking in from the previous world's castle.
 **22** | `smc_demo_W_Walking_in_Normal` | Plays when entering a world for the first time (without an airship cutscene) by walking in from the previous world's castle.
-**23** | `smc_demo_W_Flying_in` | Unused. Unused, slightly buggy world-entrance cutscene in which the airship drops Mario off at the start node before continuing to the tower like usual.
+**23** | `smc_demo_W_Flying_in` | Unused. A slightly buggy world-entrance cutscene in which the airship drops Mario off at the start node before continuing to the tower like usual.
 **24** | `smc_demo_W_Cannon_in` | Plays when entering a world for the first time (with an airship cutscene) via a cannon.
 **25** | `smc_demo_W_Cannon_in_Normal` | Plays when entering a previously-visited world via a cannon.
 **26** | `smc_demo_W1_toride_clr` | Plays when a tower is cleared for the first time.

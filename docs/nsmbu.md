@@ -1,6 +1,6 @@
 # World Map Scripts in NSMBU, NSLU, NSMBUDX
 
-**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbu" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-06T06:36:05.812228.)
+**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbu" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-06T06:38:12.568815.)
 
 The information below is specifically for the US 1.0.0 release on Wii U, except where noted. Specific numbers may vary in other releases. All names are unofficial except for the name of the "Event Assistant" actor.
 
