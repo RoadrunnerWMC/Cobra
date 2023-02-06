@@ -49,7 +49,18 @@ def generate_md_scripts_table(game: common.Game, scripts: dict) -> list:
         else:
             this_line.append('??')
 
-        this_line.append(script_info.get('description', '-').replace('\n', '<br>'))
+        # Description
+        description = ''
+
+        if script_info.get('unused', False):
+            description += 'Unused. '
+
+        description += script_info.get('description', '').replace('\n', '<br>')
+
+        if not description:
+            description = '-'
+
+        this_line.append(description.strip())
 
         lines.append(' | '.join(this_line))
 

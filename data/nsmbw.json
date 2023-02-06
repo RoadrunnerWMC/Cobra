@@ -4,171 +4,220 @@
             "add": {
                 "0":  {
                     "name": "smc_demo_default_clr",
-                    "description": "Script that plays when a normal course is successfully completed."
+                    "description": "Plays when any course (other than ambushes) is cleared."
                 },
                 "1":  {
                     "name": "smc_demo_default_fail",
-                    "description": "Script that plays when a normal course is failed."
+                    "description": "Plays when any course (other than ambushes) is failed."
                 },
                 "2":  {
-                    "name": "smc_demo_enemy_clr"
+                    "name": "smc_demo_enemy_clr",
+                    "description": "Plays when the player defeats an ambush enemy."
                 },
                 "3":  {
-                    "name": "smc_demo_enemy_fail"
+                    "name": "smc_demo_enemy_fail",
+                    "description": "Plays when the player is defeated by an ambush enemy."
                 },
                 "4":  {
                     "name": "smc_demo_toride_in",
-                    "description": "Script that plays when a tower is entered."
+                    "description": "Plays when entering a tower."
                 },
                 "5":  {
                     "name": "smc_demo_toride_clr",
-                    "description": "Script that plays when a tower is successfully completed."
+                    "description": "Plays when a tower is re-cleared."
                 },
                 "6":  {
-                    "name": "smc_demo_toride_fail"
+                    "name": "smc_demo_toride_fail",
+                    "description": "Plays when an uncompleted tower is failed."
                 },
                 "7":  {
-                    "name": "smc_demo_toride_fail2"
+                    "name": "smc_demo_toride_fail2",
+                    "description": "Plays when a completed tower is failed."
                 },
                 "8":  {
                     "name": "smc_demo_castle_in",
-                    "description": "Script that plays when a castle is entered."
+                    "description": "Plays when entering a castle, except for the secret entrance into the World 7 castle. Peach's Castle also counts."
                 },
                 "9":  {
                     "name": "smc_demo_castle_clr",
-                    "description": "Script that plays when a castle is successfully completed."
+                    "description": "Plays when a castle is re-cleared, the World 4 or World 6 castle is cleared while the airship isn't present, or Peach's Castle is exited."
                 },
                 "10": {
-                    "name": "smc_demo_castle_fail"
+                    "name": "smc_demo_castle_fail",
+                    "description": "Plays when an uncompleted castle is failed."
                 },
                 "11": {
-                    "name": "smc_demo_castle_fail2"
+                    "name": "smc_demo_castle_fail2",
+                    "description": "Plays when a completed castle is failed."
                 },
                 "12": {
                     "name": "smc_demo_ghost_in",
-                    "description": "Script that plays when a ghost house is entered."
+                    "description": "Plays when entering a ghost house."
                 },
                 "13": {
                     "name": "smc_demo_ghost_clr",
-                    "description": "Script that plays when a ghost house is successfully completed."
+                    "description": "Plays when a ghost house is cleared."
                 },
                 "14": {
-                    "name": "smc_demo_ghost_fail"
+                    "name": "smc_demo_ghost_fail",
+                    "description": "Plays when an uncompleted ghost house is failed."
                 },
                 "15": {
-                    "name": "smc_demo_ghost_fail2"
+                    "name": "smc_demo_ghost_fail2",
+                    "description": "Plays when a completed ghost house is failed."
                 },
                 "16": {
-                    "name": "smc_demo_cannon"
+                    "name": "smc_demo_cannon",
+                    "description": "Plays a very unfinished cannon animation and warps you to another world.",
+                    "unused": true
                 },
                 "17": {
                     "name": "smc_demo_trship_appear",
-                    "description": "Causes a WM_NOTE actor (if previously spawned) to appear above Mario's head, and then move to a random map node, with the camera following it."
+                    "description": "Causes a WM_NOTE actor (if previously spawned) to appear above Mario's head, and then move to a random map node, with the camera following it.",
+                    "unused": true
                 },
                 "18": {
-                    "name": "smc_demo_dokan"
+                    "name": "smc_demo_dokan",
+                    "description": "Plays when using a pipe shortcut in World 2 or World 6."
                 },
                 "19": {
-                    "name": "smc_demo_dokan_warp"
+                    "name": "smc_demo_dokan_warp",
+                    "description": "Intended to be used when entering a pipe to another world or sub-world.",
+                    "unused": true
                 },
                 "20": {
-                    "name": "smc_demo_dokan_start"
+                    "name": "smc_demo_dokan_start",
+                    "description": "Intended to be used when exiting a pipe from another world or sub-world.",
+                    "unused": true
                 },
                 "21": {
-                    "name": "smc_demo_W_Walking_in"
+                    "name": "smc_demo_W_Walking_in",
+                    "description": "Plays when entering a world for the first time (with an airship cutscene) by walking in from the previous world's castle."
                 },
                 "22": {
-                    "name": "smc_demo_W_Walking_in_Normal"
+                    "name": "smc_demo_W_Walking_in_Normal",
+                    "description": "Plays when entering a world for the first time (without an airship cutscene) by walking in from the previous world's castle."
                 },
                 "23": {
-                    "name": "smc_demo_W_Flying_in"
+                    "name": "smc_demo_W_Flying_in",
+                    "description": "Unused, slightly buggy world-entrance cutscene in which the airship drops Mario off at the start node before continuing to the tower like usual.",
+                    "unused": true
                 },
                 "24": {
-                    "name": "smc_demo_W_Cannon_in"
+                    "name": "smc_demo_W_Cannon_in",
+                    "description": "Plays when entering a world for the first time (with an airship cutscene) via a cannon."
                 },
                 "25": {
-                    "name": "smc_demo_W_Cannon_in_Normal"
+                    "name": "smc_demo_W_Cannon_in_Normal",
+                    "description": "Plays when entering a previously-visited world via a cannon."
                 },
                 "26": {
-                    "name": "smc_demo_W1_toride_clr"
+                    "name": "smc_demo_W1_toride_clr",
+                    "description": "Plays when a tower is cleared for the first time."
                 },
                 "27": {
-                    "name": "smc_demo_W1_castle_clr"
+                    "name": "smc_demo_W1_castle_clr",
+                    "description": "Plays when a castle is cleared for the first time, except in World 4."
                 },
                 "28": {
-                    "name": "smc_demo_W3_castle_clr"
+                    "name": "smc_demo_W3_castle_clr",
+                    "description": "Plays when the World 4 or World 6 castle is cleared for the first time, if the airship is present."
                 },
                 "29": {
-                    "name": "smc_demo_fade_test"
+                    "name": "smc_demo_fade_test",
+                    "description": "Fades the screen out and back in, twice.",
+                    "unused": true
                 },
                 "30": {
-                    "name": "smc_demo_view_world"
+                    "name": "smc_demo_view_world",
+                    "description": "Plays when the player uses the \"View Map\" feature."
                 },
                 "31": {
-                    "name": "smc_demo_course_in"
+                    "name": "smc_demo_course_in",
+                    "description": "Plays when entering a normal course."
                 },
                 "32": {
-                    "name": "smc_demo_kinoko_out"
+                    "name": "smc_demo_kinoko_out",
+                    "unused": true
                 },
                 "33": {
-                    "name": "smc_demo_airship_course_in"
+                    "name": "smc_demo_airship_course_in",
+                    "description": "Plays when entering an airship or anchor course."
                 },
                 "34": {
-                    "name": "smc_demo_airship_course_out"
+                    "name": "smc_demo_airship_course_out",
+                    "description": "Plays when an airship (not an anchor course) is failed."
                 },
                 "35": {
-                    "name": "smc_demo_start_kinoko_in"
+                    "name": "smc_demo_start_kinoko_in",
+                    "unused": true
                 },
                 "36": {
-                    "name": "smc_demo_airship_gonext"
+                    "name": "smc_demo_airship_gonext",
+                    "description": "Plays when the World 4 or World 6 airship (not an anchor course) is cleared for the first time."
                 },
                 "37": {
-                    "name": "smc_demo_W36_Clear_Normal"
+                    "name": "smc_demo_W36_Clear_Normal",
+                    "description": "Plays when the World 4 or World 6 anchor course (not an airship) is cleared for the first time."
                 },
                 "38": {
-                    "name": "smc_demo_null"
+                    "name": "smc_demo_null",
+                    "description": "Plays when the world map appears with no particular cutscene, such as when loading a save file or exiting a course from the pause menu."
                 },
                 "39": {
-                    "name": "smc_demo_antlion"
+                    "name": "smc_demo_antlion",
+                    "description": "Plays when sand traps appear when walking on the northern part of the World 2 map, if Mario isn't invincible."
                 },
                 "40": {
-                    "name": "smc_demo_killer"
+                    "name": "smc_demo_killer",
+                    "description": "Plays when the player bumps into a Bullet Bill or Podoboo, if Mario isn't invincible."
                 },
                 "41": {
-                    "name": "smc_demo_start_battle"
+                    "name": "smc_demo_start_battle",
+                    "description": "Plays when the player bumps into an ambush enemy (except for a sand trap, Bullet Bill, or Podoboo)."
                 },
                 "42": {
-                    "name": "smc_demo_Switch"
+                    "name": "smc_demo_Switch",
+                    "description": "Plays when hitting one of the red switches in World 3."
                 },
                 "43": {
-                    "name": "smc_demo_KoopaCastleAppear"
+                    "name": "smc_demo_KoopaCastleAppear",
+                    "description": "Plays when the World 8 airship is cleared for the first time."
                 },
                 "44": {
                     "name": "smc_demo_KinopioStart"
                 },
                 "45": {
-                    "name": "smc_demo_WorldIn_NoShip"
+                    "name": "smc_demo_WorldIn_NoShip",
+                    "description": "Plays when entering a world for the first time (without an airship cutscene) by walking in from the previous world's castle."
                 },
                 "46": {
-                    "name": "smc_demo_WorldIn_Jump_NoShip"
+                    "name": "smc_demo_WorldIn_Jump_NoShip",
+                    "description": "Plays when entering a world for the first time (without an airship cutscene) via a cannon."
                 },
                 "47": {
-                    "name": "smc_demo_Pause_Menu"
+                    "name": "smc_demo_Pause_Menu",
+                    "description": "Plays when the player opens the pause menu."
                 },
                 "48": {
-                    "name": "smc_demo_airship_clear"
+                    "name": "smc_demo_airship_clear",
+                    "description": "Plays when the World 8 airship is re-cleared."
                 },
                 "49": {
-                    "name": "smc_demo_Stock_Menu"
+                    "name": "smc_demo_Stock_Menu",
+                    "description": "Plays when the player opens the powerups menu."
                 },
                 "50": {
-                    "name": "smc_demo_WorldSelect_Menu"
+                    "name": "smc_demo_WorldSelect_Menu",
+                    "description": "Plays when the player opens the world-selection menu."
                 },
                 "51": {
-                    "name": "smc_demo_antlion_star"
+                    "name": "smc_demo_antlion_star",
+                    "description": "Plays when sand traps appear when walking on the northern part of the World 2 map, if Mario is invincible."
                 },
                 "52": {
-                    "name": "smc_demo_GameStart"
+                    "name": "smc_demo_GameStart",
+                    "description": "Plays when showing the World 1 map for the first time, after the opening cutscene."
                 }
             }
         },

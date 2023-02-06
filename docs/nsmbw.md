@@ -1,6 +1,6 @@
 # World Map Scripts in NSMBW
 
-**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-03T03:11:09.548106.)
+**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-06T06:36:05.808359.)
 
 The information below is specifically for the EU v1 release; specific numbers may vary in other releases. All names are official (derived from the Chinese Nvidia Shield TV release of NSMBW) except where noted.
 
@@ -67,59 +67,59 @@ As with the documentation above, the script names in the table below are officia
 
 ID | Name | Description
 -- | ---- | -----------
-**0** | `smc_demo_default_clr` | Script that plays when a normal course is successfully completed.
-**1** | `smc_demo_default_fail` | Script that plays when a normal course is failed.
-**2** | `smc_demo_enemy_clr` | -
-**3** | `smc_demo_enemy_fail` | -
-**4** | `smc_demo_toride_in` | Script that plays when a tower is entered.
-**5** | `smc_demo_toride_clr` | Script that plays when a tower is successfully completed.
-**6** | `smc_demo_toride_fail` | -
-**7** | `smc_demo_toride_fail2` | -
-**8** | `smc_demo_castle_in` | Script that plays when a castle is entered.
-**9** | `smc_demo_castle_clr` | Script that plays when a castle is successfully completed.
-**10** | `smc_demo_castle_fail` | -
-**11** | `smc_demo_castle_fail2` | -
-**12** | `smc_demo_ghost_in` | Script that plays when a ghost house is entered.
-**13** | `smc_demo_ghost_clr` | Script that plays when a ghost house is successfully completed.
-**14** | `smc_demo_ghost_fail` | -
-**15** | `smc_demo_ghost_fail2` | -
-**16** | `smc_demo_cannon` | -
-**17** | `smc_demo_trship_appear` | Causes a WM_NOTE actor (if previously spawned) to appear above Mario's head, and then move to a random map node, with the camera following it.
-**18** | `smc_demo_dokan` | -
-**19** | `smc_demo_dokan_warp` | -
-**20** | `smc_demo_dokan_start` | -
-**21** | `smc_demo_W_Walking_in` | -
-**22** | `smc_demo_W_Walking_in_Normal` | -
-**23** | `smc_demo_W_Flying_in` | -
-**24** | `smc_demo_W_Cannon_in` | -
-**25** | `smc_demo_W_Cannon_in_Normal` | -
-**26** | `smc_demo_W1_toride_clr` | -
-**27** | `smc_demo_W1_castle_clr` | -
-**28** | `smc_demo_W3_castle_clr` | -
-**29** | `smc_demo_fade_test` | -
-**30** | `smc_demo_view_world` | -
-**31** | `smc_demo_course_in` | -
-**32** | `smc_demo_kinoko_out` | -
-**33** | `smc_demo_airship_course_in` | -
-**34** | `smc_demo_airship_course_out` | -
-**35** | `smc_demo_start_kinoko_in` | -
-**36** | `smc_demo_airship_gonext` | -
-**37** | `smc_demo_W36_Clear_Normal` | -
-**38** | `smc_demo_null` | -
-**39** | `smc_demo_antlion` | -
-**40** | `smc_demo_killer` | -
-**41** | `smc_demo_start_battle` | -
-**42** | `smc_demo_Switch` | -
-**43** | `smc_demo_KoopaCastleAppear` | -
+**0** | `smc_demo_default_clr` | Plays when any course (other than ambushes) is cleared.
+**1** | `smc_demo_default_fail` | Plays when any course (other than ambushes) is failed.
+**2** | `smc_demo_enemy_clr` | Plays when the player defeats an ambush enemy.
+**3** | `smc_demo_enemy_fail` | Plays when the player is defeated by an ambush enemy.
+**4** | `smc_demo_toride_in` | Plays when entering a tower.
+**5** | `smc_demo_toride_clr` | Plays when a tower is re-cleared.
+**6** | `smc_demo_toride_fail` | Plays when an uncompleted tower is failed.
+**7** | `smc_demo_toride_fail2` | Plays when a completed tower is failed.
+**8** | `smc_demo_castle_in` | Plays when entering a castle, except for the secret entrance into the World 7 castle. Peach's Castle also counts.
+**9** | `smc_demo_castle_clr` | Plays when a castle is re-cleared, the World 4 or World 6 castle is cleared while the airship isn't present, or Peach's Castle is exited.
+**10** | `smc_demo_castle_fail` | Plays when an uncompleted castle is failed.
+**11** | `smc_demo_castle_fail2` | Plays when a completed castle is failed.
+**12** | `smc_demo_ghost_in` | Plays when entering a ghost house.
+**13** | `smc_demo_ghost_clr` | Plays when a ghost house is cleared.
+**14** | `smc_demo_ghost_fail` | Plays when an uncompleted ghost house is failed.
+**15** | `smc_demo_ghost_fail2` | Plays when a completed ghost house is failed.
+**16** | `smc_demo_cannon` | Unused. Plays a very unfinished cannon animation and warps you to another world.
+**17** | `smc_demo_trship_appear` | Unused. Causes a WM_NOTE actor (if previously spawned) to appear above Mario's head, and then move to a random map node, with the camera following it.
+**18** | `smc_demo_dokan` | Plays when using a pipe shortcut in World 2 or World 6.
+**19** | `smc_demo_dokan_warp` | Unused. Intended to be used when entering a pipe to another world or sub-world.
+**20** | `smc_demo_dokan_start` | Unused. Intended to be used when exiting a pipe from another world or sub-world.
+**21** | `smc_demo_W_Walking_in` | Plays when entering a world for the first time (with an airship cutscene) by walking in from the previous world's castle.
+**22** | `smc_demo_W_Walking_in_Normal` | Plays when entering a world for the first time (without an airship cutscene) by walking in from the previous world's castle.
+**23** | `smc_demo_W_Flying_in` | Unused. Unused, slightly buggy world-entrance cutscene in which the airship drops Mario off at the start node before continuing to the tower like usual.
+**24** | `smc_demo_W_Cannon_in` | Plays when entering a world for the first time (with an airship cutscene) via a cannon.
+**25** | `smc_demo_W_Cannon_in_Normal` | Plays when entering a previously-visited world via a cannon.
+**26** | `smc_demo_W1_toride_clr` | Plays when a tower is cleared for the first time.
+**27** | `smc_demo_W1_castle_clr` | Plays when a castle is cleared for the first time, except in World 4.
+**28** | `smc_demo_W3_castle_clr` | Plays when the World 4 or World 6 castle is cleared for the first time, if the airship is present.
+**29** | `smc_demo_fade_test` | Unused. Fades the screen out and back in, twice.
+**30** | `smc_demo_view_world` | Plays when the player uses the "View Map" feature.
+**31** | `smc_demo_course_in` | Plays when entering a normal course.
+**32** | `smc_demo_kinoko_out` | Unused.
+**33** | `smc_demo_airship_course_in` | Plays when entering an airship or anchor course.
+**34** | `smc_demo_airship_course_out` | Plays when an airship (not an anchor course) is failed.
+**35** | `smc_demo_start_kinoko_in` | Unused.
+**36** | `smc_demo_airship_gonext` | Plays when the World 4 or World 6 airship (not an anchor course) is cleared for the first time.
+**37** | `smc_demo_W36_Clear_Normal` | Plays when the World 4 or World 6 anchor course (not an airship) is cleared for the first time.
+**38** | `smc_demo_null` | Plays when the world map appears with no particular cutscene, such as when loading a save file or exiting a course from the pause menu.
+**39** | `smc_demo_antlion` | Plays when sand traps appear when walking on the northern part of the World 2 map, if Mario isn't invincible.
+**40** | `smc_demo_killer` | Plays when the player bumps into a Bullet Bill or Podoboo, if Mario isn't invincible.
+**41** | `smc_demo_start_battle` | Plays when the player bumps into an ambush enemy (except for a sand trap, Bullet Bill, or Podoboo).
+**42** | `smc_demo_Switch` | Plays when hitting one of the red switches in World 3.
+**43** | `smc_demo_KoopaCastleAppear` | Plays when the World 8 airship is cleared for the first time.
 **44** | `smc_demo_KinopioStart` | -
-**45** | `smc_demo_WorldIn_NoShip` | -
-**46** | `smc_demo_WorldIn_Jump_NoShip` | -
-**47** | `smc_demo_Pause_Menu` | -
-**48** | `smc_demo_airship_clear` | -
-**49** | `smc_demo_Stock_Menu` | -
-**50** | `smc_demo_WorldSelect_Menu` | -
-**51** | `smc_demo_antlion_star` | -
-**52** | `smc_demo_GameStart` | -
+**45** | `smc_demo_WorldIn_NoShip` | Plays when entering a world for the first time (without an airship cutscene) by walking in from the previous world's castle.
+**46** | `smc_demo_WorldIn_Jump_NoShip` | Plays when entering a world for the first time (without an airship cutscene) via a cannon.
+**47** | `smc_demo_Pause_Menu` | Plays when the player opens the pause menu.
+**48** | `smc_demo_airship_clear` | Plays when the World 8 airship is re-cleared.
+**49** | `smc_demo_Stock_Menu` | Plays when the player opens the powerups menu.
+**50** | `smc_demo_WorldSelect_Menu` | Plays when the player opens the world-selection menu.
+**51** | `smc_demo_antlion_star` | Plays when sand traps appear when walking on the northern part of the World 2 map, if Mario is invincible.
+**52** | `smc_demo_GameStart` | Plays when showing the World 1 map for the first time, after the opening cutscene.
 
 
 ## Commands
