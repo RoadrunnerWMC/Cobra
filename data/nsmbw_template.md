@@ -63,7 +63,59 @@ One notable `dWmDemoActor_c` subclass is `daWmDirector` (actor 664, `WM_DIRECTOR
 
 ## Scripts
 
-As with the documentation above, the script names in the table below are official. They're static arrays in `dCsSeqMng_c`.
+As with the documentation above, the script names below are official. They're static arrays in `dCsSeqMng_c`.
+
+### By usage
+
+Here are some tables to illustrate some of the more confusing script-selection scenarios:
+
+#### World entrances
+
+|                      | First time (airship present) | First time (airship not present) | Not the first time
+| -------------------- | ---------------------------- | -------------------------------- | ------------------------------
+| **Walking**          | `smc_demo_W_Walking_in`      | `smc_demo_WorldIn_NoShip`        | `smc_demo_W_Walking_in_Normal`
+| **Cannon**           | `smc_demo_W_Cannon_in`       | `smc_demo_WorldIn_Jump_NoShip`   | `smc_demo_W_Cannon_in_Normal`
+| **Riding airship**\* | `smc_demo_W_Flying_in`       |                                  |
+| **Menu**             |                              | `null`**                         | `null`
+
+*\*Unused entrance method.*
+
+*\*\*World 9 is entered this way.*
+
+#### Clearing a tower
+
+|                 | First time               | Not the first time
+| --------------- | ------------------------ | ---------------------
+| **(Any world)** | `smc_demo_W1_toride_clr` | `smc_demo_toride_clr`
+
+#### Clearing a castle
+
+|             | First time (airship present) | First time (airship not present) | Not the first time
+| ----------- | ---------------------------- | -------------------------------- | ---------------------
+| **World 1** | `smc_demo_W1_castle_clr`     | `smc_demo_W1_castle_clr`         | `smc_demo_castle_clr`
+| **World 2** | `smc_demo_W1_castle_clr`     | `smc_demo_W1_castle_clr`         | `smc_demo_castle_clr`
+| **World 3** | `smc_demo_W1_castle_clr`     | `smc_demo_W1_castle_clr`         | `smc_demo_castle_clr`
+| **World 4** | `smc_demo_W3_castle_clr`     | `smc_demo_castle_clr`            | `smc_demo_castle_clr`
+| **World 5** | `smc_demo_W1_castle_clr`     | `smc_demo_W1_castle_clr`         | `smc_demo_castle_clr`
+| **World 6** | `smc_demo_W3_castle_clr`     | `smc_demo_castle_clr`            | `smc_demo_castle_clr`
+| **World 7** | `smc_demo_W1_castle_clr`     | `smc_demo_W1_castle_clr`         | `smc_demo_castle_clr`
+| **World 8** |                              |                                  | `smc_demo_castle_clr`
+
+#### Failing an airship
+
+|                 | Airship present               | Airship not present ("anchor course")
+| --------------- | ----------------------------- | -------------------------------------
+| **(Any world)** | `smc_demo_airship_course_out` | `smc_demo_default_fail`
+
+#### Clearing an airship
+
+|             | First time (airship present) | First time (airship not present) | Not the first time
+| ----------- | ---------------------------- | -------------------------------- | ------------------------
+| **World 4** | `smc_demo_airship_gonext`    | `smc_demo_W36_Clear_Normal`      | `smc_demo_default_clr`
+| **World 6** | `smc_demo_airship_gonext`    | `smc_demo_W36_Clear_Normal`      | `smc_demo_default_clr`
+| **World 8** | `smc_demo_KoopaCastleAppear` |                                  | `smc_demo_airship_clear`
+
+### By number
 
 {{SCRIPTS}}
 

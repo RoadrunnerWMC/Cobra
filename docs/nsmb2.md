@@ -1,6 +1,6 @@
 # World Map Scripts in NSMB2
 
-**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmb2" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-06T23:12:04.762022.)
+**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmb2" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-07T01:47:27.711414.)
 
 The information below is specifically for the US Gold Edition release; specific numbers may vary in other releases. Process names are official, but others are not.
 
