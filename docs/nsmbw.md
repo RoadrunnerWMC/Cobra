@@ -1,6 +1,6 @@
 # World Map Scripts in NSMBW
 
-**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-06T06:38:12.566613.)
+**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-06T23:12:04.758974.)
 
 The information below is specifically for the EU v1 release; specific numbers may vary in other releases. All names are official (derived from the Chinese Nvidia Shield TV release of NSMBW) except where noted.
 
@@ -48,12 +48,12 @@ class dWmDemoActor_c : dWmActor_c {
 Subclasses all have the following call in their `execute()` methods:
 
 ```cpp
-vf60(dCsSeqMng_c::m_instance.GetCutName(), unknown_flag);
+vf60(dCsSeqMng_c::m_instance->GetCutName(), unknown_flag);
 ```
 
 That virtual function is overridden by each subclass. Its purpose is to check if the current command type is one the actor recognizes, and perform any necessary actions if so.
 
-When a `dWmDemoActor_c` has finished handling a command that it's responsible for, it calls `setCutEnd()` on itself. Every frame when a script is running, `dCsSeqMng_c` calls `checkCutEnd()` on each `dWmDemoActor_c` instance to see if any of them have set the flag. If so, it advances to the next command, and calls `clearCutEnd()` on all `dWmDemoActor_c` instances to reset them.
+When a `dWmDemoActor_c` is satisfied that it has nothing more to do to handle the current command (because it's finished handling it or the command isn't relevant to it), it either calls `setCutEnd()` on itself or sets the attribute to `true` directly. Every frame when a script is running, `dCsSeqMng_c` calls `checkCutEnd()` on each `dWmDemoActor_c` instance to see if any of them *don't* have the flag set. If it finds any, it remains on the current command to give those actors more time to complete their tasks. Once all actors have the flag set, it advances to the next command, and calls `clearCutEnd()` on all `dWmDemoActor_c` instances to reset them.
 
 It's a slightly convoluted system, for sure.
 
