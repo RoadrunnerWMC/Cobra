@@ -1,6 +1,6 @@
 # World Map Scripts in NSMBW
 
-**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-07T01:47:27.709360.)
+**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-07T01:59:26.850795.)
 
 The information below is specifically for the EU v1 release; specific numbers may vary in other releases. All names are official (derived from the Chinese Nvidia Shield TV release of NSMBW) except where noted.
 
@@ -146,7 +146,7 @@ ID | Name | Description
 **24** | `smc_demo_W_Cannon_in` | Plays when entering a world for the first time (with an airship cutscene) via a cannon.
 **25** | `smc_demo_W_Cannon_in_Normal` | Plays when entering a previously-visited world via a cannon.
 **26** | `smc_demo_W1_toride_clr` | Plays when a tower is cleared for the first time.
-**27** | `smc_demo_W1_castle_clr` | Plays when a castle is cleared for the first time, except in World 4.
+**27** | `smc_demo_W1_castle_clr` | Plays when a castle is cleared for the first time, except in World 4 or World 6.
 **28** | `smc_demo_W3_castle_clr` | Plays when the World 4 or World 6 castle is cleared for the first time, if the airship is present.
 **29** | `smc_demo_fade_test` | Unused. Fades the screen out and back in, twice.
 **30** | `smc_demo_view_world` | Plays when the player uses the "View Map" feature.
@@ -180,12 +180,12 @@ These names are *not* official.
 
 ID | Name | Description | Argument
 -- | ---- | ----------- | --------
-**0** | `wait` | Causes the script to delay before continuing. Note: NSMBW runs at 60 FPS. | Duration (frames)
+**0** | `wait` | Wait for a certain amount of time before continuing. (Note: NSMBW runs at 60 FPS.) | Duration (frames)
 **1** | ?? | - | ??
 **2** | ?? | - | ??
 **3** | ?? | - | ??
 **4** | ?? | - | ??
-**5** | `end` | Ends the script. | None
+**5** | `end` | End the script. | None
 **6** | ?? | - | ??
 **7** | ?? | - | ??
 **8** | ?? | - | ??
@@ -211,8 +211,8 @@ ID | Name | Description | Argument
 **28** | ?? | - | ??
 **29** | ?? | - | ??
 **30** | ?? | - | ??
-**31** | `show_wm_note_over_player` | Causes a WM_NOTE actor (if previously spawned) to appear above Mario's head. | None
-**32** | `move_wm_note` | Causes a WM_NOTE actor (if previously spawned) to move to a random map node, with the camera following it. | None
+**31** | `show_wm_note` | If a WM_NOTE actor is present, make it appear at the player's position. | None
+**32** | `move_wm_note` | If a WM_NOTE actor is present, move it to a random map node, with the camera following it. | None
 **33** | ?? | - | ??
 **34** | ?? | - | ??
 **35** | ?? | Unused. | ??
@@ -260,7 +260,7 @@ ID | Name | Description | Argument
 **77** | ?? | - | ??
 **78** | ?? | - | ??
 **79** | ?? | - | ??
-**80** | ?? | - | ??
+**80** | `show_continues` | Wait for 10 frames. Then, if any players have zero lives, show the "Continues Used" window to bring them back up to five. | None
 **81** | ?? | - | ??
 **82** | ?? | - | ??
 **83** | ?? | - | ??
@@ -292,8 +292,8 @@ ID | Name | Description | Argument
 **109** | ?? | - | ??
 **110** | ?? | - | ??
 **111** | ?? | - | ??
-**112** | ?? | - | ??
-**113** | ?? | - | ??
+**112** | `play_toad_kidnap_cutscene` | Play the Toad kidnapping cutscene if needed. | None
+**113** | `play_toad_balloon_animation` | If a toad balloon (crying Toad face icon hovering over a course) needs to appear or disappear, play the animation. | None
 **114** | ?? | - | ??
 **115** | ?? | - | ??
 **116** | ?? | - | ??
@@ -320,8 +320,8 @@ ID | Name | Description | Argument
 **137** | ?? | - | ??
 **138** | ?? | Unused. | ??
 **139** | ?? | - | ??
-**140** | ?? | - | ??
-**141** | ?? | - | ??
+**140** | `stop_music` | Stop the background music if it's currently playing. | None
+**141** | `start_music` | Start the background music if it's not currently playing. | None
 **142** | ?? | - | ??
 **143** | ?? | - | ??
 **144** | ?? | - | ??
@@ -335,7 +335,7 @@ ID | Name | Description | Argument
 **152** | ?? | - | ??
 **153** | ?? | - | ??
 **154** | ?? | - | ??
-**155** | ?? | - | ??
+**155** | `wait_for_toad_balloon_sfx` | If the Toad "Help me!" sound effect (`SE_VOC_ITEM_KO_HELP_ME`) is playing, wait until it finishes. | None
 **156** | ?? | - | ??
 **157** | ?? | - | ??
 **158** | ?? | - | ??

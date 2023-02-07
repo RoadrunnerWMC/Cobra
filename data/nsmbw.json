@@ -117,7 +117,7 @@
                 },
                 "27": {
                     "name": "smc_demo_W1_castle_clr",
-                    "description": "Plays when a castle is cleared for the first time, except in World 4."
+                    "description": "Plays when a castle is cleared for the first time, except in World 4 or World 6."
                 },
                 "28": {
                     "name": "smc_demo_W3_castle_clr",
@@ -225,8 +225,9 @@
             "add": {
                 "0": {
                     "name": "wait",
-                    "description": "Causes the script to delay before continuing. Note: NSMBW runs at 60 FPS.",
-                    "arg": {"name": "Duration", "unit": "frames"}
+                    "description": "Wait for a certain amount of time before continuing. (Note: NSMBW runs at 60 FPS.)",
+                    "arg": {"name": "Duration", "unit": "frames"},
+                    "handled_by": "WM_DIRECTOR"
                 },
                 "1": {},
                 "2": {},
@@ -234,8 +235,9 @@
                 "4": {},
                 "5": {
                     "name": "end",
-                    "description": "Ends the script.",
-                    "arg": null
+                    "description": "End the script.",
+                    "arg": null,
+                    "handled_by": "WM_CS_SEQ_MNG"
                 },
                 "6": {},
                 "7": {},
@@ -263,14 +265,16 @@
                 "29": {},
                 "30": {},
                 "31": {
-                    "name": "show_wm_note_over_player",
-                    "description": "Causes a WM_NOTE actor (if previously spawned) to appear above Mario's head.",
-                    "arg": null
+                    "name": "show_wm_note",
+                    "description": "If a WM_NOTE actor is present, make it appear at the player's position.",
+                    "arg": null,
+                    "handled_by": "WM_NOTE"
                 },
                 "32": {
                     "name": "move_wm_note",
-                    "description": "Causes a WM_NOTE actor (if previously spawned) to move to a random map node, with the camera following it.",
-                    "arg": null
+                    "description": "If a WM_NOTE actor is present, move it to a random map node, with the camera following it.",
+                    "arg": null,
+                    "handled_by": "WM_NOTE"
                 },
                 "33": {},
                 "34": {},
@@ -319,7 +323,12 @@
                 "77": {},
                 "78": {},
                 "79": {},
-                "80": {},
+                "80": {
+                    "name": "show_continues",
+                    "description": "Wait for 10 frames. Then, if any players have zero lives, show the \"Continues Used\" window to bring them back up to five.",
+                    "arg": null,
+                    "handled_by": "WM_DIRECTOR"
+                },
                 "81": {},
                 "82": {},
                 "83": {},
@@ -351,8 +360,18 @@
                 "109": {},
                 "110": {},
                 "111": {},
-                "112": {},
-                "113": {},
+                "112": {
+                    "name": "play_toad_kidnap_cutscene",
+                    "description": "Play the World 1 Toad kidnapping cutscene if needed.",
+                    "arg": null,
+                    "handled_by": "WM_KINOPIO"
+                },
+                "113": {
+                    "name": "play_toad_balloon_animation",
+                    "description": "If a toad balloon (crying Toad face icon hovering over a course) needs to appear or disappear, play the animation.",
+                    "arg": null,
+                    "handled_by": "WM_KINOBALLOON"
+                },
                 "114": {},
                 "115": {},
                 "116": {},
@@ -379,8 +398,18 @@
                 "137": {},
                 "138": {"unused": true},
                 "139": {},
-                "140": {},
-                "141": {},
+                "140": {
+                    "name": "stop_music",
+                    "description": "Stop the background music if it's currently playing.",
+                    "arg": null,
+                    "handled_by": "WM_DIRECTOR"
+                },
+                "141": {
+                    "name": "start_music",
+                    "description": "Start the background music if it's not currently playing.",
+                    "arg": null,
+                    "handled_by": "WM_DIRECTOR"
+                },
                 "142": {},
                 "143": {},
                 "144": {},
@@ -394,7 +423,12 @@
                 "152": {},
                 "153": {},
                 "154": {},
-                "155": {},
+                "155": {
+                    "name": "wait_for_toad_balloon_sfx",
+                    "description": "If the Toad \"Help me!\" sound effect (`SE_VOC_ITEM_KO_HELP_ME`) is playing, wait until it finishes.",
+                    "arg": null,
+                    "handled_by": "WM_KINOBALLOON"
+                },
                 "156": {},
                 "157": {},
                 "158": {},
