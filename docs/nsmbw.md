@@ -1,6 +1,6 @@
 # World Map Scripts in NSMBW
 
-**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-20T08:01:01.568365.)
+**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-20T16:55:49.784007.)
 
 The information below is specifically for the EU v1 release; specific numbers may vary in other releases. All names are official (derived from the Chinese Nvidia Shield TV release of NSMBW) except where noted.
 
@@ -151,10 +151,10 @@ ID | Name | Description
 **29** | `smc_demo_fade_test` | Unused. Fades the screen out and back in, twice.
 **30** | `smc_demo_view_world` | Plays when the player uses the "View Map" feature.
 **31** | `smc_demo_course_in` | Plays when entering a normal course.
-**32** | `smc_demo_kinoko_out` | Unused.
+**32** | `smc_demo_kinoko_out` | Unused. Locks HUD visibility before hiding any Toad Houses that need to be hidden.
 **33** | `smc_demo_airship_course_in` | Plays when entering an airship or anchor course.
 **34** | `smc_demo_airship_course_out` | Plays when an airship (not an anchor course) is failed.
-**35** | `smc_demo_start_kinoko_in` | Unused.
+**35** | `smc_demo_start_kinoko_in` | Unused. Does nothing.
 **36** | `smc_demo_airship_gonext` | Plays when the World 4 or World 6 airship (not an anchor course) is cleared for the first time.
 **37** | `smc_demo_W36_Clear_Normal` | Plays when the World 4 or World 6 anchor course (not an airship) is cleared for the first time.
 **38** | `smc_demo_null` | Plays when the world map appears with no particular cutscene, such as when loading a save file or exiting a course from the pause menu.

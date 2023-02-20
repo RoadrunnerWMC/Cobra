@@ -138,6 +138,7 @@
                 },
                 "32": {
                     "name": "smc_demo_kinoko_out",
+                    "description": "Locks HUD visibility before hiding any Toad Houses that need to be hidden.",
                     "unused": true
                 },
                 "33": {
@@ -150,6 +151,7 @@
                 },
                 "35": {
                     "name": "smc_demo_start_kinoko_in",
+                    "description": "Does nothing.",
                     "unused": true
                 },
                 "36": {
