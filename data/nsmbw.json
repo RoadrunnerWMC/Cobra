@@ -226,8 +226,7 @@
                 "0": {
                     "name": "wait",
                     "description": "Wait for a certain amount of time before continuing. (Note: NSMBW runs at 60 FPS.)",
-                    "arg": {"name": "Duration", "unit": "frames"},
-                    "handled_by": "WM_DIRECTOR"
+                    "arg": {"name": "Duration", "unit": "frames"}
                 },
                 "1": {},
                 "2": {},
@@ -236,8 +235,7 @@
                 "5": {
                     "name": "end",
                     "description": "End the script.",
-                    "arg": null,
-                    "handled_by": "WM_CS_SEQ_MNG"
+                    "arg": null
                 },
                 "6": {},
                 "7": {},
@@ -267,17 +265,23 @@
                 "31": {
                     "name": "show_wm_note",
                     "description": "If a WM_NOTE actor is present, make it appear at the player's position.",
-                    "arg": null,
-                    "handled_by": "WM_NOTE"
+                    "arg": null
                 },
                 "32": {
                     "name": "move_wm_note",
                     "description": "If a WM_NOTE actor is present, move it to a random map node, with the camera following it.",
-                    "arg": null,
-                    "handled_by": "WM_NOTE"
+                    "arg": null
                 },
-                "33": {},
-                "34": {},
+                "33": {
+                    "name": "show_treasure_ship",
+                    "description": "If WM_TREASURESHIP and WM_NOTE actors are present, make the WM_TREASURESHIP appear at the WM_NOTE's position.",
+                    "arg": null
+                },
+                "34": {
+                    "name": "animate_treasure_ship",
+                    "description": "If a WM_TREASURESHIP actor is present, have it descend toward its target map node, and then animate the camera back to the player's position.",
+                    "arg": null
+                },
                 "35": {"unused": true},
                 "36": {},
                 "37": {},
@@ -303,7 +307,11 @@
                 "57": {},
                 "58": {},
                 "59": {},
-                "60": {},
+                "60": {
+                    "name": "hide_toad_house",
+                    "description": "If a Toad House needs to be hidden because the player played it and hasn't 100%ed the game yet, play the animation.",
+                    "arg": null
+                },
                 "61": {},
                 "62": {},
                 "63": {},
@@ -326,8 +334,7 @@
                 "80": {
                     "name": "show_continues",
                     "description": "Wait for 10 frames. Then, if any players have zero lives, show the \"Continues Used\" window to bring them back up to five.",
-                    "arg": null,
-                    "handled_by": "WM_DIRECTOR"
+                    "arg": null
                 },
                 "81": {},
                 "82": {},
@@ -345,7 +352,11 @@
                 "94": {},
                 "95": {},
                 "96": {},
-                "97": {},
+                "97": {
+                    "name": "show_toad_house",
+                    "description": "If a Toad house needs to appear because the player rescued a Toad, play the animation.",
+                    "arg": null
+                },
                 "98": {},
                 "99": {},
                 "100": {},
@@ -363,14 +374,12 @@
                 "112": {
                     "name": "play_toad_kidnap_cutscene",
                     "description": "Play the World 1 Toad kidnapping cutscene if needed.",
-                    "arg": null,
-                    "handled_by": "WM_KINOPIO"
+                    "arg": null
                 },
                 "113": {
                     "name": "play_toad_balloon_animation",
                     "description": "If a toad balloon (crying Toad face icon hovering over a course) needs to appear or disappear, play the animation.",
-                    "arg": null,
-                    "handled_by": "WM_KINOBALLOON"
+                    "arg": null
                 },
                 "114": {},
                 "115": {},
@@ -386,8 +395,16 @@
                 "125": {"unused": true},
                 "126": {},
                 "127": {},
-                "128": {},
-                "129": {},
+                "128": {
+                    "name": "lock_hud_visibility",
+                    "description": "Prevent the HUD from being shown or hidden until `unlock_hud_visibility` is run.",
+                    "arg": null
+                },
+                "129": {
+                    "name": "unlock_hud_visibility",
+                    "description": "Undoes the effect of `lock_hud_visibility`.",
+                    "arg": null
+                },
                 "130": {},
                 "131": {},
                 "132": {},
@@ -401,14 +418,12 @@
                 "140": {
                     "name": "stop_music",
                     "description": "Stop the background music if it's currently playing.",
-                    "arg": null,
-                    "handled_by": "WM_DIRECTOR"
+                    "arg": null
                 },
                 "141": {
                     "name": "start_music",
                     "description": "Start the background music if it's not currently playing.",
-                    "arg": null,
-                    "handled_by": "WM_DIRECTOR"
+                    "arg": null
                 },
                 "142": {},
                 "143": {},
@@ -426,8 +441,7 @@
                 "155": {
                     "name": "wait_for_toad_balloon_sfx",
                     "description": "If the Toad \"Help me!\" sound effect (`SE_VOC_ITEM_KO_HELP_ME`) is playing, wait until it finishes.",
-                    "arg": null,
-                    "handled_by": "WM_KINOBALLOON"
+                    "arg": null
                 },
                 "156": {},
                 "157": {},

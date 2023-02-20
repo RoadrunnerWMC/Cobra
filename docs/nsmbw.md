@@ -1,6 +1,6 @@
 # World Map Scripts in NSMBW
 
-**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-07T01:59:26.850795.)
+**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-20T06:49:42.840964.)
 
 The information below is specifically for the EU v1 release; specific numbers may vary in other releases. All names are official (derived from the Chinese Nvidia Shield TV release of NSMBW) except where noted.
 
@@ -213,8 +213,8 @@ ID | Name | Description | Argument
 **30** | ?? | - | ??
 **31** | `show_wm_note` | If a WM_NOTE actor is present, make it appear at the player's position. | None
 **32** | `move_wm_note` | If a WM_NOTE actor is present, move it to a random map node, with the camera following it. | None
-**33** | ?? | - | ??
-**34** | ?? | - | ??
+**33** | `show_treasure_ship` | If WM_TREASURESHIP and WM_NOTE actors are present, make the WM_TREASURESHIP appear at the WM_NOTE's position. | None
+**34** | `animate_treasure_ship` | If a WM_TREASURESHIP actor is present, have it descend toward its target map node, and then animate the camera back to the player's position. | None
 **35** | ?? | Unused. | ??
 **36** | ?? | - | ??
 **37** | ?? | - | ??
@@ -240,7 +240,7 @@ ID | Name | Description | Argument
 **57** | ?? | - | ??
 **58** | ?? | - | ??
 **59** | ?? | - | ??
-**60** | ?? | - | ??
+**60** | `hide_toad_house` | If a Toad House needs to be hidden because the player played it and hasn't 100%ed the game yet, play the animation. | None
 **61** | ?? | - | ??
 **62** | ?? | - | ??
 **63** | ?? | - | ??
@@ -277,7 +277,7 @@ ID | Name | Description | Argument
 **94** | ?? | - | ??
 **95** | ?? | - | ??
 **96** | ?? | - | ??
-**97** | ?? | - | ??
+**97** | `show_toad_house` | If a Toad house needs to appear because the player rescued a Toad, play the animation. | None
 **98** | ?? | - | ??
 **99** | ?? | - | ??
 **100** | ?? | - | ??
@@ -292,7 +292,7 @@ ID | Name | Description | Argument
 **109** | ?? | - | ??
 **110** | ?? | - | ??
 **111** | ?? | - | ??
-**112** | `play_toad_kidnap_cutscene` | Play the Toad kidnapping cutscene if needed. | None
+**112** | `play_toad_kidnap_cutscene` | Play the World 1 Toad kidnapping cutscene if needed. | None
 **113** | `play_toad_balloon_animation` | If a toad balloon (crying Toad face icon hovering over a course) needs to appear or disappear, play the animation. | None
 **114** | ?? | - | ??
 **115** | ?? | - | ??
@@ -308,8 +308,8 @@ ID | Name | Description | Argument
 **125** | ?? | Unused. | ??
 **126** | ?? | - | ??
 **127** | ?? | - | ??
-**128** | ?? | - | ??
-**129** | ?? | - | ??
+**128** | `lock_hud_visibility` | Prevent the HUD from being shown or hidden until `unlock_hud_visibility` is run. | None
+**129** | `unlock_hud_visibility` | Undoes the effect of `lock_hud_visibility`. | None
 **130** | ?? | - | ??
 **131** | ?? | - | ??
 **132** | ?? | - | ??
