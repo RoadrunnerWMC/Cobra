@@ -73,7 +73,7 @@
                 },
                 "17": {
                     "name": "smc_demo_trship_appear",
-                    "description": "Causes a WM_NOTE actor (if previously spawned) to appear above Mario's head, and then move to a random map node, with the camera following it.",
+                    "description": "Causes a WM_NOTE actor (if previously spawned) to appear above Mario's head, and then move to a random map node, with the camera following it. Then a WM_TREASURESHIP (if spawned) appears above it and descends onto it, before the camera returns back to the player.",
                     "unused": true
                 },
                 "18": {
@@ -185,7 +185,9 @@
                     "description": "Plays when the World 8 airship is cleared for the first time."
                 },
                 "44": {
-                    "name": "smc_demo_KinopioStart"
+                    "name": "smc_demo_KinopioStart",
+                    "description": "Waits for one second and then plays a Toad balloon animation if needed.",
+                    "unused": true
                 },
                 "45": {
                     "name": "smc_demo_WorldIn_NoShip",

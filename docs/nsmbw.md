@@ -1,6 +1,6 @@
 # World Map Scripts in NSMBW
 
-**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-20T06:49:42.840964.)
+**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-20T08:01:01.568365.)
 
 The information below is specifically for the EU v1 release; specific numbers may vary in other releases. All names are official (derived from the Chinese Nvidia Shield TV release of NSMBW) except where noted.
 
@@ -136,7 +136,7 @@ ID | Name | Description
 **14** | `smc_demo_ghost_fail` | Plays when an uncompleted ghost house is failed.
 **15** | `smc_demo_ghost_fail2` | Plays when a completed ghost house is failed.
 **16** | `smc_demo_cannon` | Unused. Plays a very unfinished cannon animation and warps you to another world.
-**17** | `smc_demo_trship_appear` | Unused. Causes a WM_NOTE actor (if previously spawned) to appear above Mario's head, and then move to a random map node, with the camera following it.
+**17** | `smc_demo_trship_appear` | Unused. Causes a WM_NOTE actor (if previously spawned) to appear above Mario's head, and then move to a random map node, with the camera following it. Then a WM_TREASURESHIP (if spawned) appears above it and descends onto it, before the camera returns back to the player.
 **18** | `smc_demo_dokan` | Plays when using a pipe shortcut in World 2 or World 6.
 **19** | `smc_demo_dokan_warp` | Unused. Intended to be used when entering a pipe to another world or sub-world.
 **20** | `smc_demo_dokan_start` | Unused. Intended to be used when exiting a pipe from another world or sub-world.
@@ -163,7 +163,7 @@ ID | Name | Description
 **41** | `smc_demo_start_battle` | Plays when the player bumps into an ambush enemy (except for a sand trap, Bullet Bill, or Podoboo).
 **42** | `smc_demo_Switch` | Plays when hitting one of the red switches in World 3.
 **43** | `smc_demo_KoopaCastleAppear` | Plays when the World 8 airship is cleared for the first time.
-**44** | `smc_demo_KinopioStart` | -
+**44** | `smc_demo_KinopioStart` | Unused. Waits for one second and then plays a Toad balloon animation if needed.
 **45** | `smc_demo_WorldIn_NoShip` | Plays when entering a world for the first time (without an airship cutscene) by walking in from the previous world's castle.
 **46** | `smc_demo_WorldIn_Jump_NoShip` | Plays when entering a world for the first time (without an airship cutscene) via a cannon.
 **47** | `smc_demo_Pause_Menu` | Plays when the player opens the pause menu.
