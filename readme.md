@@ -129,4 +129,9 @@ NSMBUDX:
 
 - `all`: all versions (international 1.0.0, and CN versions 1.0.0 and 1.0.1)
 
+NSMBW:
+
+- `v1_`: the "v1" and "v2" releases (SMNP v1/v2, SMNE v1/v2, SMNJ v1/v2)
+- `v3_`: Korean and newer (SMNK, SMNW, SMNC)
+
 Other games: (todo)

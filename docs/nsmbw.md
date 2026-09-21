@@ -1,6 +1,6 @@
 # World Map Scripts in NSMBW
 
-**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2023-02-20T16:55:49.784007.)
+**THIS IS AN AUTO-GENERATED FILE -- DO NOT EDIT DIRECTLY!** Instead, edit the "nsmbw" files in the `data/` folder and run `cobra.py generate_documentation`. (Generated 2026-09-21T18:56:20.803205.)
 
 The information below is specifically for the EU v1 release; specific numbers may vary in other releases. All names are official (derived from the Chinese Nvidia Shield TV release of NSMBW) except where noted.
 
@@ -117,6 +117,8 @@ Here are some tables to illustrate some of the more confusing script-selection s
 
 ### By number
 
+### "v1" and "v2" (SMNP v1/v2, SMNE v1/v2, SMNJ v1/v2)
+
 ID | Name | Description
 -- | ---- | -----------
 **0** | `smc_demo_default_clr` | Plays when any course (other than ambushes) is cleared.
@@ -177,6 +179,8 @@ ID | Name | Description
 ## Commands
 
 These names are *not* official.
+
+### "v1" and "v2" (SMNP v1/v2, SMNE v1/v2, SMNJ v1/v2)
 
 ID | Name | Description | Argument
 -- | ---- | ----------- | --------
@@ -349,4 +353,10 @@ ID | Name | Description | Argument
 **166** | ?? | - | ??
 **167** | ?? | - | ??
 **168** | ?? | - | ??
+
+### Korean and newer (SMNK, SMNW, SMNC)
+
+ID | Name | Description | Argument
+-- | ---- | ----------- | --------
+**169** | ?? | - | ??
 

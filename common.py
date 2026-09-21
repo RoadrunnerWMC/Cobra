@@ -81,6 +81,19 @@ class Game(enum.Enum):
         else:
             return '<'
 
+    def letter(self) -> str:
+        """
+        Return the letter identifying the game, for the WMSC file header
+        """
+        if self is Game.NSMBW:
+            return 'W'
+        elif self is Game.NSMB2:
+            return '2'
+        elif self is Game.NSMBU:
+            return 'U'
+        else:
+            return 'X'  # NSMBUDX
+
 
 @dataclasses.dataclass
 class LowLevelCommand:

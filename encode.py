@@ -213,15 +213,26 @@ def convert_to_low_level(high_level_scripts: dict, variant: game_variants.GameVa
     return low_level_scripts
 
 
-def encode_wmsc(scripts: dict, *, endian: str, use_priorities: bool) -> bytes:
+def encode_wmsc(variant: game_variants.GameVariant, scripts: dict) -> bytes:
     """
     Convert a dict of common.LowLevelScript to .wmsc file data
     """
+    use_priorities = variant.game.uses_script_priorities()
+
     data = bytearray()
     table_entry_len = (8 if use_priorities else 4)
 
+    endian = variant.game.endian()
     def u32(val: int) -> bytes:
         return struct.pack(f'{endian}I', val)
+
+    data += b'WMS0'
+    data += variant.game.letter().encode('ascii')
+    data += variant.id.encode('ascii')
+    assert len(data) == 0x8
+
+    # File size -- we'll go back and fill this in at the end
+    data += b'\0\0\0\0'
 
     # Number of scripts
     data += u32(len(scripts))
@@ -249,6 +260,9 @@ def encode_wmsc(scripts: dict, *, endian: str, use_priorities: bool) -> bytes:
         for command in script:
             data += u32(command.id) + u32(command.argument)
 
+    # Fill in the file size in the header
+    data[8:12] = u32(len(data))
+
     return bytes(data)
 
 
@@ -272,9 +286,7 @@ def do_encode(scripts_file: pathlib.Path, version_info_file: pathlib.Path, wmsc_
     scripts_low = convert_to_low_level(scripts_high, variant)
 
     # Encode and save .wmsc data
-    wmsc_data = encode_wmsc(scripts_low,
-        endian=variant.game.endian(),
-        use_priorities=variant.game.uses_script_priorities())
+    wmsc_data = encode_wmsc(variant, scripts_low)
 
     with wmsc_file.open('wb') as f:
         f.write(wmsc_data)

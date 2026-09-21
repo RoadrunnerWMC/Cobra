@@ -204,6 +204,15 @@ class NSMBWAnalysis(export_base.Analysis):
         """
         Return the appropriate GameVariant instance for the source
         """
-        # Only one variant defined for NSMBW
         variants = game_variants.load_game_json(common.Game.NSMBW)
-        return variants['all']
+
+        # Same search we do in find_table_addr()
+        window_base = self.source.search(
+            b'AUTO_SELECT\0WORLD_MAP', 0x80300000, 0x80400000)
+
+        # The K version added enough code that we can reliably
+        # differentiate between pre- and post-K like this:
+        if window_base >= 0x80320000:
+            return variants['v3_']
+        else:
+            return variants['v1_']
