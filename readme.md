@@ -17,6 +17,10 @@ this, NSMBW only partially works, I haven't started on NSMB2 at all yet, and
 there's no way to load your .wmsc files into any of the three games. ...So don't
 expect very much to work just yet.
 
+**Update:** Here are some projects I'm aware of that support loading .wmsc files into the games:
+- NSMBW: [PropelParts](https://github.com/PropelParts-org/PropelParts)
+- NSMBU: [Tsuru](https://github.com/Zenith-Team/Tsuru)
+
 ## World map scripts?
 
 todo: explain what that even means
