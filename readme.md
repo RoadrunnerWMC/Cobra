@@ -19,7 +19,7 @@ expect very much to work just yet.
 
 **Update:** Here are some projects I'm aware of that support loading .wmsc files into the games:
 - NSMBW: [PropelParts](https://github.com/PropelParts-org/PropelParts)
-- NSMBU: [Tsuru](https://github.com/Zenith-Team/Tsuru)
+- NSMBU: [NSMBU-CSScript](https://github.com/Ryguy0777/NSMBU-CSScript), [Tsuru](https://github.com/Zenith-Team/Tsuru) (deprecated)
 
 ## World map scripts?
 
